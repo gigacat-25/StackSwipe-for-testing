@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 
 const SWIPE_LIMIT = 10;
 
@@ -54,56 +55,66 @@ export default function SwipePage() {
 
   return (
     <main className="container mx-auto p-4 md:p-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
-           <Card>
-              <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2"><SlidersHorizontal/> Filters</CardTitle>
-                <CardDescription>Refine your search to find the perfect match.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input id="location" placeholder="e.g., San Francisco, CA" />
-                  </div>
-                  <div>
-                    <Label htmlFor="tech-stack">Tech Stack</Label>
-                    <Input id="tech-stack" placeholder="e.g., React, Python" />
-                  </div>
-                   <Button className="w-full" disabled>Apply Filters</Button>
-              </CardContent>
-            </Card>
+      <div className="flex flex-col items-center justify-start space-y-6">
+        <div className="w-full flex justify-end">
+            <Sheet>
+                <SheetTrigger asChild>
+                    <Button variant="outline">
+                        <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
+                    </Button>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle className="font-headline flex items-center gap-2">
+                            <SlidersHorizontal/> Filters
+                        </SheetTitle>
+                        <SheetDescription>
+                            Refine your search to find the perfect match.
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div className="py-4 space-y-4">
+                        <div>
+                            <Label htmlFor="location">Location</Label>
+                            <Input id="location" placeholder="e.g., San Francisco, CA" />
+                        </div>
+                        <div>
+                            <Label htmlFor="tech-stack">Tech Stack</Label>
+                            <Input id="tech-stack" placeholder="e.g., React, Python" />
+                        </div>
+                        <Button className="w-full" disabled>Apply Filters</Button>
+                    </div>
+                </SheetContent>
+            </Sheet>
         </div>
-        <div className="lg:col-span-2 flex flex-col items-center justify-start space-y-6">
-           <div className="relative w-full max-w-sm h-[700px]">
-                {limitReached ? (
-                     <Card className="flex flex-col items-center justify-center text-center h-full">
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">You're out of swipes!</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p>You've reached your daily limit of {SWIPE_LIMIT} swipes. Come back tomorrow for more connections!</p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <ProfileCard profile={profiles[currentIndex]} />
-                )}
-           </div>
 
-            <div className="flex items-center justify-center space-x-4">
-                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
-                    <XIcon className="h-8 w-8" />
-                </Button>
-                 <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0}>
-                    <Undo className="h-6 w-6" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached}>
-                    <Heart className="h-8 w-8" />
-                </Button>
-            </div>
-            <div className="text-center text-muted-foreground">
-                <p>Swipes remaining: {SWIPE_LIMIT - swipes} / {SWIPE_LIMIT}</p>
-            </div>
+        <div className="relative w-full max-w-sm h-[700px]">
+            {limitReached ? (
+                    <Card className="flex flex-col items-center justify-center text-center h-full">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">You're out of swipes!</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p>You've reached your daily limit of {SWIPE_LIMIT} swipes. Come back tomorrow for more connections!</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <ProfileCard profile={profiles[currentIndex]} />
+            )}
+        </div>
+
+        <div className="flex items-center justify-center space-x-4">
+            <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
+                <XIcon className="h-8 w-8" />
+            </Button>
+                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0}>
+                <Undo className="h-6 w-6" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached}>
+                <Heart className="h-8 w-8" />
+            </Button>
+        </div>
+        <div className="text-center text-muted-foreground">
+            <p>Swipes remaining: {SWIPE_LIMIT - swipes} / {SWIPE_LIMIT}</p>
         </div>
       </div>
     </main>
