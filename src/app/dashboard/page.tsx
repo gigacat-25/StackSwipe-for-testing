@@ -90,7 +90,7 @@ export default function SwipePage() {
                 )}
            </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-center space-x-4">
                 <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
                     <XIcon className="h-8 w-8" />
                 </Button>
