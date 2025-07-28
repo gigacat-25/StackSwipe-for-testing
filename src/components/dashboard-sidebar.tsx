@@ -87,9 +87,9 @@ export function DashboardSidebar() {
                     <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                     <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 flex flex-col">
-                    <span className="text-sm font-semibold">{currentUser.name}</span>
-                    <span className="text-xs text-muted-foreground">{currentUser.headline}</span>
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <span className="text-sm font-semibold truncate">{currentUser.name}</span>
+                    <span className="text-xs text-muted-foreground truncate">{currentUser.headline}</span>
                 </div>
                  <div className="flex items-center gap-1">
                     <ThemeToggle />
