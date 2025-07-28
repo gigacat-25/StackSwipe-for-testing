@@ -156,10 +156,10 @@ export default function RecommendationsPage() {
                     <CardHeader>
                         <CardTitle className="font-headline text-2xl flex items-center gap-2">
                             <Bot className="text-primary" />
-                            AI Career Chat
+                            StackBot
                         </CardTitle>
                         <CardDescription>
-                            Ask me anything about coding, interviews, or the job market!
+                            Your AI assistant for career advice, learning paths, and more.
                         </CardDescription>
                     </CardHeader>
                     <ScrollArea className="flex-1 p-4">
