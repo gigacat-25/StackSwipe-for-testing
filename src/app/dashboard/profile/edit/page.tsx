@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -30,6 +30,7 @@ const networkingTagOptions = ['Mentor', 'Mentee', 'Teammate', 'Vibes', 'Referral
 export default function EditProfilePage() {
   const { toast } = useToast();
   const { user, setUser } = useUser();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -84,6 +85,29 @@ export default function EditProfilePage() {
     console.log(data);
   }
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedUser = {
+          ...user,
+          avatarUrl: reader.result as string,
+        };
+        setUser(updatedUser);
+        toast({
+          title: 'Photo Updated',
+          description: 'Your new photo has been set.',
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleChoosePhoto = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <main className="container mx-auto p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
@@ -105,7 +129,14 @@ export default function EditProfilePage() {
                             <AvatarImage src={user.avatarUrl} alt={user.name} />
                             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <Button type="button" variant="outline">Change Photo</Button>
+                        <Button type="button" variant="outline" onClick={handleChoosePhoto}>Change Photo</Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handlePhotoChange}
+                            className="hidden"
+                            accept="image/*"
+                        />
                     </div>
 
                     <FormField
