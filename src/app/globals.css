@@ -62,3 +62,32 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+    @keyframes swipe-out-left {
+        from {
+            transform: translateX(0) rotate(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(-150%) rotate(-20deg);
+            opacity: 0;
+        }
+    }
+    @keyframes swipe-out-right {
+        from {
+            transform: translateX(0) rotate(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(150%) rotate(20deg);
+            opacity: 0;
+        }
+    }
+    .animate-swipe-out-left {
+        animation: swipe-out-left 0.3s ease-out forwards;
+    }
+    .animate-swipe-out-right {
+        animation: swipe-out-right 0.3s ease-out forwards;
+    }
+}

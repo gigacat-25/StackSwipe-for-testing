@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, SlidersHorizontal, Undo, X as XIcon } from 'lucide-react';
 import { profiles } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 const SWIPE_LIMIT = 10;
 
 export default function SwipePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [swipes, setSwipes] = useState(0);
+  const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | ''>('');
   const { toast } = useToast();
 
   const handleSwipe = (action: 'like' | 'dislike') => {
@@ -34,13 +36,18 @@ export default function SwipePage() {
       });
       return;
     }
+    
+    setSwipeAnimation(action === 'like' ? 'right' : 'left');
 
-    toast({
-      title: `You ${action}d ${profiles[currentIndex].name}`,
-    });
+    setTimeout(() => {
+        toast({
+          title: `You ${action}d ${profiles[currentIndex].name}`,
+        });
 
-    setSwipes(swipes + 1);
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length);
+        setSwipes(swipes + 1);
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % profiles.length);
+        setSwipeAnimation('');
+    }, 300);
   };
   
   const handleUndo = () => {
@@ -52,6 +59,11 @@ export default function SwipePage() {
   };
 
   const limitReached = swipes >= SWIPE_LIMIT;
+  const animationClass = 
+      swipeAnimation === 'left' ? 'animate-swipe-out-left' : 
+      swipeAnimation === 'right' ? 'animate-swipe-out-right' : 
+      '';
+
 
   return (
     <main className="container mx-auto p-4 md:p-8">
@@ -99,19 +111,21 @@ export default function SwipePage() {
                       </CardContent>
                   </Card>
               ) : (
+                <div className={cn("absolute w-full h-full", animationClass)}>
                   <ProfileCard profile={profiles[currentIndex]} />
+                </div>
               )}
           </div>
 
           <div className="flex flex-col items-center space-y-4">
             <div className="flex items-center justify-center space-x-4">
-                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
+                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached || !!swipeAnimation}>
                     <XIcon className="h-8 w-8" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0 || limitReached}>
+                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0 || limitReached || !!swipeAnimation}>
                     <Undo className="h-6 w-6" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached}>
+                <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached || !!swipeAnimation}>
                     <Heart className="h-8 w-8" />
                 </Button>
             </div>
