@@ -93,7 +93,7 @@ export const profiles: UserProfile[] = [
   },
 ];
 
-export const currentUser: UserProfile = profiles[0];
+export let currentUser: UserProfile = profiles[0];
 
 export type Message = {
   id: string;

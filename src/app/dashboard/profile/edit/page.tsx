@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -18,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { profileFormSchema, type ProfileFormValues } from '@/lib/schemas';
-import { currentUser } from '@/lib/data';
+import { currentUser as initialUser, type UserProfile } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Save } from 'lucide-react';
@@ -27,6 +28,7 @@ const networkingTagOptions = ['Mentor', 'Mentee', 'Teammate', 'Vibes', 'Referral
 
 export default function EditProfilePage() {
   const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<UserProfile>(initialUser);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -44,6 +46,21 @@ export default function EditProfilePage() {
   });
 
   function onSubmit(data: ProfileFormValues) {
+    const updatedUser: UserProfile = {
+        ...currentUser,
+        name: data.name,
+        headline: data.headline,
+        bio: data.bio ?? '',
+        currentWork: data.currentWork ?? '',
+        techStack: data.techStack?.split(',').map(s => s.trim()) ?? [],
+        interests: data.interests?.split(',').map(i => i.trim()) ?? [],
+        networkingTags: data.networkingTags ?? [],
+        links: {
+            github: data.github ?? '',
+            linkedin: data.linkedin ?? '',
+        }
+    };
+    setCurrentUser(updatedUser);
     toast({
       title: 'Profile Updated',
       description: 'Your profile has been saved successfully.',
@@ -193,7 +210,7 @@ export default function EditProfilePage() {
                                                 checked={field.value?.includes(item)}
                                                 onCheckedChange={(checked) => {
                                                 return checked
-                                                    ? field.onChange([...field.value, item])
+                                                    ? field.onChange([...(field.value ?? []), item])
                                                     : field.onChange(
                                                         field.value?.filter(
                                                         (value) => value !== item
