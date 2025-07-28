@@ -87,34 +87,36 @@ export default function SwipePage() {
             </Sheet>
         </div>
 
-        <div className="relative w-full max-w-sm h-[700px]">
-            {limitReached ? (
-                    <Card className="flex flex-col items-center justify-center text-center h-full">
-                    <CardHeader>
-                        <CardTitle className="font-headline text-2xl">You're out of swipes!</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p>You've reached your daily limit of {SWIPE_LIMIT} swipes. Come back tomorrow for more connections!</p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <ProfileCard profile={profiles[currentIndex]} />
-            )}
-        </div>
+        <div className="w-full max-w-sm space-y-6">
+          <div className="relative h-[700px]">
+              {limitReached ? (
+                      <Card className="flex flex-col items-center justify-center text-center h-full">
+                      <CardHeader>
+                          <CardTitle className="font-headline text-2xl">You're out of swipes!</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p>You've reached your daily limit of {SWIPE_LIMIT} swipes. Come back tomorrow for more connections!</p>
+                      </CardContent>
+                  </Card>
+              ) : (
+                  <ProfileCard profile={profiles[currentIndex]} />
+              )}
+          </div>
 
-        <div className="flex items-center justify-center space-x-4">
-            <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
-                <XIcon className="h-8 w-8" />
-            </Button>
-                <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0}>
-                <Undo className="h-6 w-6" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached}>
-                <Heart className="h-8 w-8" />
-            </Button>
-        </div>
-        <div className="text-center text-muted-foreground">
-            <p>Swipes remaining: {SWIPE_LIMIT - swipes} / {SWIPE_LIMIT}</p>
+          <div className="flex items-center justify-center space-x-4">
+              <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-600" onClick={() => handleSwipe('dislike')} disabled={limitReached}>
+                  <XIcon className="h-8 w-8" />
+              </Button>
+                  <Button variant="outline" size="icon" className="h-12 w-12 rounded-full border-2" onClick={handleUndo} disabled={currentIndex === 0}>
+                  <Undo className="h-6 w-6" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-16 w-16 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-100 hover:text-green-600" onClick={() => handleSwipe('like')} disabled={limitReached}>
+                  <Heart className="h-8 w-8" />
+              </Button>
+          </div>
+          <div className="text-center text-muted-foreground">
+              <p>Swipes remaining: {SWIPE_LIMIT - swipes} / {SWIPE_LIMIT}</p>
+          </div>
         </div>
       </div>
     </main>
