@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
-import { currentUser } from '@/lib/data';
+import { useUser } from '@/hooks/use-user';
 
 const menuItems = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
@@ -39,6 +39,7 @@ const menuItems = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { user: currentUser } = useUser();
 
   return (
     <Sidebar>

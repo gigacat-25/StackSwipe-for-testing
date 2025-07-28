@@ -8,12 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { getRecommendations } from '@/actions/recommendations';
 import { postChatMessage } from '@/actions/chatbot';
-import { currentUser } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/hooks/use-user';
 
 type ChatMessage = {
     sender: 'user' | 'bot';
@@ -21,6 +21,7 @@ type ChatMessage = {
 };
 
 export default function RecommendationsPage() {
+    const { user: currentUser } = useUser();
     const [networkingGoals, setNetworkingGoals] = useState('Find a mentor in frontend development and connect with potential teammates for a side project.');
     const [profileDetails] = useState(JSON.stringify({
         headline: currentUser.headline,

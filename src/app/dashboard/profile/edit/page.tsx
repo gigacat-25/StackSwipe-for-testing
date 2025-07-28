@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -19,35 +19,51 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { profileFormSchema, type ProfileFormValues } from '@/lib/schemas';
-import { currentUser as initialUser, type UserProfile } from '@/lib/data';
+import { type UserProfile } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, Save } from 'lucide-react';
+import { useUser } from '@/hooks/use-user';
 
 const networkingTagOptions = ['Mentor', 'Mentee', 'Teammate', 'Vibes', 'Referrals'];
 
 export default function EditProfilePage() {
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState<UserProfile>(initialUser);
+  const { user, setUser } = useUser();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: currentUser.name,
-      headline: currentUser.headline,
-      bio: currentUser.bio,
-      currentWork: currentUser.currentWork,
-      techStack: currentUser.techStack.join(', '),
-      interests: currentUser.interests.join(', '),
-      networkingTags: currentUser.networkingTags,
-      github: currentUser.links.github,
-      linkedin: currentUser.links.linkedin,
+        name: user.name,
+        headline: user.headline,
+        bio: user.bio,
+        currentWork: user.currentWork,
+        techStack: user.techStack.join(', '),
+        interests: user.interests.join(', '),
+        networkingTags: user.networkingTags,
+        github: user.links.github,
+        linkedin: user.links.linkedin,
     },
   });
 
+  useEffect(() => {
+    form.reset({
+        name: user.name,
+        headline: user.headline,
+        bio: user.bio,
+        currentWork: user.currentWork,
+        techStack: user.techStack.join(', '),
+        interests: user.interests.join(', '),
+        networkingTags: user.networkingTags,
+        github: user.links.github,
+        linkedin: user.links.linkedin,
+    });
+  }, [user, form]);
+
+
   function onSubmit(data: ProfileFormValues) {
     const updatedUser: UserProfile = {
-        ...currentUser,
+        ...user,
         name: data.name,
         headline: data.headline,
         bio: data.bio ?? '',
@@ -60,7 +76,7 @@ export default function EditProfilePage() {
             linkedin: data.linkedin ?? '',
         }
     };
-    setCurrentUser(updatedUser);
+    setUser(updatedUser);
     toast({
       title: 'Profile Updated',
       description: 'Your profile has been saved successfully.',
@@ -86,8 +102,8 @@ export default function EditProfilePage() {
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <div className="flex items-center space-x-4">
                          <Avatar className="h-20 w-20">
-                            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
-                            <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <Button type="button" variant="outline">Change Photo</Button>
                     </div>
