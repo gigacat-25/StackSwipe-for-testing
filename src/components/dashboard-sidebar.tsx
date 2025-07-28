@@ -26,15 +26,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
-import { ThemeToggle } from './theme-toggle';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-
 
 const menuItems = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
@@ -90,25 +81,6 @@ export function DashboardSidebar() {
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <span className="text-sm font-semibold truncate">{currentUser.name}</span>
                     <span className="text-xs text-muted-foreground truncate">{currentUser.headline}</span>
-                </div>
-                 <div className="flex items-center gap-1">
-                    <ThemeToggle />
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon">
-                                <Globe className="h-[1.2rem] w-[1.2rem]" />
-                                <span className="sr-only">Change language</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                English
-                            </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
-                                Kannada
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
                 </div>
             </div>
              <SidebarMenu>
