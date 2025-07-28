@@ -10,6 +10,7 @@ import {
   User,
   Github,
   LogOut,
+  Globe,
 } from 'lucide-react';
 
 import {
@@ -26,6 +27,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
 import { ThemeToggle } from './theme-toggle';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+
 
 const menuItems = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
@@ -82,7 +91,25 @@ export function DashboardSidebar() {
                     <span className="text-sm font-semibold">{currentUser.name}</span>
                     <span className="text-xs text-muted-foreground">{currentUser.headline}</span>
                 </div>
-                 <ThemeToggle />
+                 <div className="flex items-center gap-1">
+                    <ThemeToggle />
+                     <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Globe className="h-[1.2rem] w-[1.2rem]" />
+                                <span className="sr-only">Change language</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                                English
+                            </DropdownMenuItem>
+                            <DropdownMenuItem disabled>
+                                Kannada
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
              <SidebarMenu>
                 <SidebarMenuItem>
