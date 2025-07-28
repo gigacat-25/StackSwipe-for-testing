@@ -25,6 +25,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
+import { ThemeToggle } from './theme-toggle';
 
 const menuItems = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
@@ -77,10 +78,11 @@ export function DashboardSidebar() {
                     <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                     <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col">
+                <div className="flex-1 flex flex-col">
                     <span className="text-sm font-semibold">{currentUser.name}</span>
                     <span className="text-xs text-muted-foreground">{currentUser.headline}</span>
                 </div>
+                 <ThemeToggle />
             </div>
              <SidebarMenu>
                 <SidebarMenuItem>
