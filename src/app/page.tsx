@@ -1,7 +1,10 @@
 
-import Link from 'next/link';
-import { Github } from 'lucide-react';
+'use client';
 
+import { useRouter } from 'next/navigation';
+import { Github } from 'lucide-react';
+import { signInWithPopup, GithubAuthProvider } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,8 +14,28 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { useToast } from '@/hooks/use-toast';
+
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogin = async () => {
+    const provider = new GithubAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error) {
+      console.error("Authentication failed:", error);
+      toast({
+        title: 'Authentication Failed',
+        description: 'Could not log in with GitHub. Please try again.',
+        variant: 'destructive'
+      })
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
@@ -30,14 +53,9 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col space-y-4">
-                <Button asChild size="lg">
-                    <Link href="/dashboard">
-                        <Github className="mr-2 h-5 w-5" />
-                        Login with GitHub
-                    </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg">
-                    <Link href="/dashboard">Login with another provider</Link>
+                <Button onClick={handleLogin} size="lg">
+                    <Github className="mr-2 h-5 w-5" />
+                    Login with GitHub
                 </Button>
             </div>
           </CardContent>
