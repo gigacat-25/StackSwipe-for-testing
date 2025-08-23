@@ -3,15 +3,10 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import DashboardLayout from './dashboard/layout';
-
-// Note: `metadata` is not supported in client components.
-// If you need to set metadata, you would move this to a server component layout.
-// For this example, we'll keep it simple.
 
 export default function RootLayout({
   children,
@@ -19,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isLoginPage = pathname === '/login';
+  const isDashboardRoute = pathname.startsWith('/dashboard');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -43,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {isLoginPage ? children : <DashboardLayout>{children}</DashboardLayout>}
+          {isDashboardRoute ? <DashboardLayout>{children}</DashboardLayout> : children}
           <Toaster />
         </ThemeProvider>
       </body>
