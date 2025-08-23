@@ -28,7 +28,7 @@ import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
 
 const menuItems = [
-  { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
+  { href: '/', icon: LayoutGrid, label: 'Swipe' },
   { href: '/dashboard/messages', icon: MessageSquare, label: 'Messages' },
   {
     href: '/dashboard/recommendations',
@@ -41,6 +41,11 @@ const menuItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user: currentUser } = useUser();
+
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
   return (
     <Sidebar>
@@ -58,7 +63,7 @@ export function DashboardSidebar() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={isActive(item.href)}
                 tooltip={{ children: item.label, side: 'right' }}
               >
                 <Link href={item.href}>
