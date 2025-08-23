@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -28,7 +29,7 @@ import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
 
 const menuItems = [
-  { href: '/', icon: LayoutGrid, label: 'Swipe' },
+  { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
   { href: '/dashboard/messages', icon: MessageSquare, label: 'Messages' },
   {
     href: '/dashboard/recommendations',
@@ -43,7 +44,7 @@ export function DashboardSidebar() {
   const { user: currentUser } = useUser();
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
+    if (href === '/dashboard') return pathname === '/dashboard';
     return pathname.startsWith(href);
   };
 
@@ -91,7 +92,7 @@ export function DashboardSidebar() {
              <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild variant="outline">
-                        <Link href="/">
+                        <Link href="/login">
                             <LogOut />
                             <span>Logout</span>
                         </Link>
