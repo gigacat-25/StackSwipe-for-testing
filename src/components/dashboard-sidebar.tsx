@@ -12,6 +12,7 @@ import {
   Github,
   LogOut,
   Globe,
+  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -27,6 +28,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
 import { useUser } from '@/hooks/use-user';
+import { getAuth, signOut } from 'firebase/auth';
+import { firebaseApp } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
 
 const menuItems = [
   { href: '/dashboard', icon: LayoutGrid, label: 'Swipe' },
@@ -37,11 +41,19 @@ const menuItems = [
     label: 'AI Recommendations',
   },
   { href: '/dashboard/profile/edit', icon: User, label: 'My Profile' },
+  { href: '/dashboard/profile/create', icon: UserPlus, label: 'Create Profile' },
 ];
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user: currentUser } = useUser();
+  const auth = getAuth(firebaseApp);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -91,11 +103,9 @@ export function DashboardSidebar() {
             </div>
              <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild variant="outline">
-                        <Link href="/login">
-                            <LogOut />
-                            <span>Logout</span>
-                        </Link>
+                    <SidebarMenuButton onClick={handleLogout} variant="outline">
+                        <LogOut />
+                        <span>Logout</span>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>

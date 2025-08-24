@@ -3,7 +3,6 @@
 
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard-sidebar';
-import { UserProvider } from '@/hooks/use-user';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
@@ -20,7 +19,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <UserProvider>
       <SidebarProvider>
         <DashboardSidebar />
         <SidebarInset>
@@ -50,6 +48,5 @@ export default function DashboardLayout({
           </div>
         </SidebarInset>
       </SidebarProvider>
-    </UserProvider>
   );
 }

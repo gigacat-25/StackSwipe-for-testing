@@ -5,7 +5,7 @@ import { Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
-import { getAuth, signInWithPopup, GithubAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithPopup, GithubAuthProvider, getAdditionalUserInfo } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -19,8 +19,14 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         try {
-            await signInWithPopup(auth, provider);
-            router.push('/dashboard');
+            const result = await signInWithPopup(auth, provider);
+            const additionalInfo = getAdditionalUserInfo(result);
+
+            if (additionalInfo?.isNewUser) {
+                router.push('/dashboard/profile/create');
+            } else {
+                router.push('/dashboard');
+            }
         } catch (error) {
             console.error('Authentication error:', error);
             toast({
