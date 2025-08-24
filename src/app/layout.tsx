@@ -1,20 +1,16 @@
 
-
 'use client';
 
 import { usePathname } from 'next/navigation';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
-import DashboardLayout from './dashboard/layout';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isDashboardRoute = pathname.startsWith('/dashboard');
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -38,7 +34,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {isDashboardRoute ? <DashboardLayout>{children}</DashboardLayout> : children}
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>
