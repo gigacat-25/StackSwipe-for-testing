@@ -5,8 +5,6 @@ import { usePathname } from 'next/navigation';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
-import DashboardLayout from './dashboard/layout';
-import { UserProvider } from '@/hooks/use-user';
 
 export default function RootLayout({
   children,
@@ -32,21 +30,15 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <UserProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            {isLoginPage ? (
-              children
-            ) : (
-              <DashboardLayout>{children}</DashboardLayout>
-            )}
+            {children}
             <Toaster />
           </ThemeProvider>
-        </UserProvider>
       </body>
     </html>
   );

@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
-import { useUser } from '@/hooks/use-user';
 import { getAuth, signOut } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
@@ -40,13 +39,10 @@ const menuItems = [
     icon: Sparkles,
     label: 'AI Recommendations',
   },
-  { href: '/dashboard/profile/edit', icon: User, label: 'My Profile' },
-  { href: '/dashboard/profile/create', icon: UserPlus, label: 'Create Profile' },
 ];
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user: currentUser } = useUser();
   const auth = getAuth(firebaseApp);
   const router = useRouter();
 
@@ -91,16 +87,6 @@ export function DashboardSidebar() {
       <SidebarSeparator />
       <SidebarFooter>
         <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3 p-2">
-                <Avatar>
-                    <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
-                    <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    <span className="text-sm font-semibold truncate">{currentUser.name}</span>
-                    <span className="text-xs text-muted-foreground truncate">{currentUser.headline}</span>
-                </div>
-            </div>
              <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton onClick={handleLogout} variant="outline">
