@@ -1,7 +1,4 @@
 
-'use client';
-
-import { usePathname } from 'next/navigation';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -11,9 +8,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isLoginPage = pathname === '/login';
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>

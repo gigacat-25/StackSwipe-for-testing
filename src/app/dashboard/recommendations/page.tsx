@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { useUser } from '@/hooks/use-user';
+import { currentUser } from '@/lib/data';
 
 type ChatMessage = {
     sender: 'user' | 'bot';
@@ -21,7 +21,6 @@ type ChatMessage = {
 };
 
 export default function RecommendationsPage() {
-    const { user: currentUser } = useUser();
     const [networkingGoals, setNetworkingGoals] = useState('Find a mentor in frontend development and connect with potential teammates for a side project.');
     const [profileDetails] = useState(JSON.stringify({
         headline: currentUser.headline,
