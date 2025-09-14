@@ -114,7 +114,7 @@ export default function OnboardingPage() {
                 title: 'Profile Created!',
                 description: "Welcome to StackSwipe! Let's find your next connection.",
             });
-            router.push('/');
+            router.push('/dashboard');
         } catch (error) {
              toast({
                 title: 'Error creating profile',

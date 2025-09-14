@@ -23,10 +23,8 @@ export default function SignupPage() {
         e.preventDefault();
         try {
             await signup(email, password);
-            // After signup, the useAuth hook will detect the new user
-            // and the root page.tsx will redirect to /onboarding because hasProfile will be false.
-            // So we just need to push to the root.
-            router.push('/');
+            // After signup, explicitly redirect to onboarding.
+            router.push('/onboarding');
         } catch (error) {
             console.error('Signup error:', error);
             toast({
