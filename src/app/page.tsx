@@ -10,16 +10,19 @@ export default function HomePage() {
   const { user, loading, hasProfile } = useAuth();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        if (hasProfile) {
-            router.replace('/dashboard');
-        } else {
-            router.replace('/onboarding');
-        }
-      } else {
-        router.replace('/login');
-      }
+    if (loading) {
+      return; // Wait until loading is false
+    }
+
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
+
+    if (hasProfile) {
+      router.replace('/dashboard');
+    } else {
+      router.replace('/onboarding');
     }
   }, [user, loading, hasProfile, router]);
 
