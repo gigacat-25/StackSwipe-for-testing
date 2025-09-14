@@ -97,14 +97,14 @@ export type Message = {
 };
 
 export type Conversation = {
-  contactId: number;
+  contactId: string;
   contactName: string;
   messages: Message[];
 };
 
 export const conversations: Conversation[] = [
     {
-        contactId: 2,
+        contactId: "2",
         contactName: "Sam Chen",
         messages: [
             { id: '1', sender: 'them', text: "Hey Alex! Saw your profile, impressive work with design systems.", timestamp: "10:00 AM" },
@@ -112,7 +112,7 @@ export const conversations: Conversation[] = [
         ]
     },
     {
-        contactId: 3,
+        contactId: "3",
         contactName: "Jessica Wu",
         messages: [
             { id: '1', sender: 'them', text: "Hi Alex, I'm looking for a frontend expert to chat about a side project. Interested?", timestamp: "Yesterday" },
