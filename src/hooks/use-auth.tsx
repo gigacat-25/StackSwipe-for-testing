@@ -62,17 +62,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     const updateProfile = async (newProfile: UserProfile) => {
         if (user) {
-            const profileToSave = { ...newProfile };
-
-            // Don't save base64 image data to Firestore.
-            // This is a temporary fix. A real implementation would upload to Firebase Storage.
-            if (profileToSave.avatarUrl && profileToSave.avatarUrl.startsWith('data:image')) {
-                // If user has an existing photoURL from Firebase Auth, use it. Otherwise, fallback.
-                profileToSave.avatarUrl = user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`;
-            }
-            
-            await setDoc(doc(db, 'users', user.uid), profileToSave);
-            setProfile(newProfile); // Keep the preview image on the client
+            await setDoc(doc(db, 'users', user.uid), newProfile);
+            setProfile(newProfile);
             setHasProfile(true);
         }
     };

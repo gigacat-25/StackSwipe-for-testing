@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,14 +18,10 @@ import { User as UserIcon } from 'lucide-react';
 export default function ProfilePage() {
     const { profile: initialProfile, updateProfile, loading } = useAuth();
     const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
         setProfile(initialProfile);
-        if (initialProfile?.avatarUrl) {
-            setAvatarPreview(initialProfile.avatarUrl);
-        }
     }, [initialProfile]);
 
     if (loading || !profile) {
@@ -69,19 +64,6 @@ export default function ProfilePage() {
         setProfile(prev => prev ? ({ ...prev, [field]: value.split(',').map(item => item.trim()) }) : null);
     };
 
-     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const result = reader.result as string;
-                setAvatarPreview(result);
-                setProfile(prev => prev ? ({ ...prev, avatarUrl: result }) : null);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (profile) {
@@ -112,13 +94,9 @@ export default function ProfilePage() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex flex-col items-center gap-4">
                             <Avatar className="w-24 h-24">
-                                <AvatarImage src={avatarPreview ?? undefined} />
+                                <AvatarImage src={profile.avatarUrl ?? undefined} />
                                 <AvatarFallback className="text-4xl"><UserIcon /></AvatarFallback>
                             </Avatar>
-                            <div className="space-y-2 text-center">
-                                <Label htmlFor="avatar">Change Profile Picture</Label>
-                                <Input id="avatar" type="file" accept="image/*" onChange={handleAvatarChange} className="w-full max-w-xs" />
-                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -207,5 +185,3 @@ export default function ProfilePage() {
         </main>
     );
 }
-
-    
