@@ -15,6 +15,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import type { UserProfile } from '@/lib/data';
 
 const profileStepSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -81,7 +82,7 @@ export default function OnboardingPage() {
             return;
         }
         
-        const newProfile = {
+        const newProfile: UserProfile = {
             id: user.uid,
             name: data.name,
             avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`, // Placeholder avatar
@@ -90,7 +91,7 @@ export default function OnboardingPage() {
             currentWork: data.currentWork,
             techStack: (data.techStack || '').split(',').map(item => item.trim()).filter(Boolean),
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
-            networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean) as any,
+            networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean) as UserProfile['networkingTags'],
             links: {
                 github: 'https://github.com',
                 linkedin: 'https://linkedin.com',
