@@ -46,7 +46,6 @@ export default function SwipePage() {
         const swipesQuery = query(collection(db, 'swipes'), where('swiperId', '==', user.uid));
         const swipesSnapshot = await getDocs(swipesQuery);
         const alreadySwipedIds = new Set(swipesSnapshot.docs.map(doc => doc.data().swipedId));
-        setSwipedIds(alreadySwipedIds);
         
         const allProfiles = await getAllUsers();
         // Filter out the current user's profile and profiles they've already swiped
@@ -119,6 +118,9 @@ export default function SwipePage() {
             action: action,
             timestamp: serverTimestamp(),
         });
+        
+        // Add the swiped profile ID to the set of swiped IDs
+        setSwipedIds(prev => new Set(prev).add(swipedProfile.id));
 
         if (action === 'like') {
             await checkForMatch(swipedProfile);
