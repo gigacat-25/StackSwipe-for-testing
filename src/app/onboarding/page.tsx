@@ -88,9 +88,9 @@ export default function OnboardingPage() {
             headline: data.headline,
             bio: data.bio,
             currentWork: data.currentWork,
-            techStack: data.techStack.split(',').map(item => item.trim()),
-            interests: data.interests.split(',').map(item => item.trim()),
-            networkingTags: data.networkingTags.split(',').map(item => item.trim()) as any,
+            techStack: (data.techStack || '').split(',').map(item => item.trim()).filter(Boolean),
+            interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
+            networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean) as any,
             links: {
                 github: 'https://github.com',
                 linkedin: 'https://linkedin.com',
