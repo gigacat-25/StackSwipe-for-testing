@@ -8,7 +8,7 @@ export type UserProfile = {
   currentWork: string;
   techStack: string[];
   interests: string[];
-  networkingTags: ('Mentor' | 'Mentee' | 'Teammate' | 'Vibes' | 'Referrals')[];
+  networkingTags: string[];
   links: {
     github: string;
     linkedin: string;

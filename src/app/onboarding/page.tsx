@@ -91,7 +91,7 @@ export default function OnboardingPage() {
             currentWork: data.currentWork,
             techStack: (data.techStack || '').split(',').map(item => item.trim()).filter(Boolean),
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
-            networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean) as UserProfile['networkingTags'],
+            networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean),
             links: {
                 github: 'https://github.com',
                 linkedin: 'https://linkedin.com',
