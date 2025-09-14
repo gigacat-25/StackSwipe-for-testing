@@ -7,6 +7,7 @@ export type UserProfile = {
   headline: string;
   bio: string;
   currentWork: string;
+  location: string;
   techStack: string[];
   interests: string[];
   networkingTags: string[];

@@ -103,6 +103,11 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
+                            <Label htmlFor="location">Location</Label>
+                            <Input id="location" name="location" value={profile.location} onChange={handleInputChange} />
+                        </div>
+                        
+                        <div className="space-y-2">
                             <Label htmlFor="bio">Bio</Label>
                             <Textarea id="bio" name="bio" value={profile.bio} onChange={handleInputChange} rows={4} />
                         </div>

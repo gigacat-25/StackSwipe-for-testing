@@ -1,7 +1,7 @@
 
 'use client';
 import Link from 'next/link';
-import { Github, Linkedin, Briefcase, Code, Sparkles as InterestIcon } from 'lucide-react';
+import { Github, Linkedin, Briefcase, Code, Sparkles as InterestIcon, MapPin } from 'lucide-react';
 import { type UserProfile } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,10 @@ export function ProfileCard({ profile }: ProfileCardProps) {
     <Card className="w-full max-w-sm rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
       <CardHeader className="p-6 pb-2">
             <CardTitle className="font-headline text-2xl">{profile.name}</CardTitle>
+            <CardDescription className="flex items-center gap-1.5 text-muted-foreground">
+              <MapPin className="h-4 w-4" />
+              {profile.location}
+            </CardDescription>
             <CardDescription>{profile.headline}</CardDescription>
       </CardHeader>
       <CardContent className="px-6 py-2 space-y-4 flex-1">

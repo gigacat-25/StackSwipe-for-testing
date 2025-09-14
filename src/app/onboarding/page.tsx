@@ -20,6 +20,7 @@ const profileStepSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   headline: z.string().min(5, { message: 'Headline must be at least 5 characters.' }),
   bio: z.string().min(10, { message: 'Bio must be at least 10 characters.' }),
+  location: z.string().min(2, { message: 'Location must be at least 2 characters.' }),
 });
 
 const workStepSchema = z.object({
@@ -38,7 +39,7 @@ const goalsStepSchema = z.object({
 });
 
 const allSteps = [
-    { id: 'Step 1', name: 'Profile Basics', fields: ['name', 'headline', 'bio'], schema: profileStepSchema },
+    { id: 'Step 1', name: 'Profile Basics', fields: ['name', 'headline', 'bio', 'location'], schema: profileStepSchema },
     { id: 'Step 2', name: 'Work & Skills', fields: ['currentWork', 'techStack', 'interests'], schema: workStepSchema },
     { id: 'Step 3', name: 'Social Links', fields: ['github', 'linkedin'], schema: socialStepSchema },
     { id: 'Step 4', name: 'Networking Goals', fields: ['networkingTags'], schema: goalsStepSchema },
@@ -60,6 +61,7 @@ export default function OnboardingPage() {
             name: '',
             headline: '',
             bio: '',
+            location: '',
             currentWork: '',
             techStack: '',
             interests: '',
@@ -95,6 +97,7 @@ export default function OnboardingPage() {
             name: data.name,
             headline: data.headline,
             bio: data.bio,
+            location: data.location,
             currentWork: data.currentWork,
             techStack: (data.techStack || '').split(',').map(item => item.trim()).filter(Boolean),
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
@@ -150,6 +153,13 @@ export default function OnboardingPage() {
                                         <FormItem>
                                             <FormLabel>Headline</FormLabel>
                                             <FormControl><Input {...field} placeholder="e.g., Senior Software Engineer @ DevCo" /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                    <FormField control={form.control} name="location" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Location</FormLabel>
+                                            <FormControl><Input {...field} placeholder="e.g., San Francisco, CA" /></FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )} />
