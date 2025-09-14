@@ -94,37 +94,37 @@ export default function ProfilePage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
-                                <Input id="name" name="name" value={profile.name} onChange={handleInputChange} />
+                                <Input id="name" name="name" value={profile.name ?? ''} onChange={handleInputChange} />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="headline">Headline</Label>
-                                <Input id="headline" name="headline" value={profile.headline} onChange={handleInputChange} />
+                                <Input id="headline" name="headline" value={profile.headline ?? ''} onChange={handleInputChange} />
                             </div>
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="location">Location</Label>
-                            <Input id="location" name="location" value={profile.location} onChange={handleInputChange} />
+                            <Input id="location" name="location" value={profile.location ?? ''} onChange={handleInputChange} />
                         </div>
                         
                         <div className="space-y-2">
                             <Label htmlFor="bio">Bio</Label>
-                            <Textarea id="bio" name="bio" value={profile.bio} onChange={handleInputChange} rows={4} />
+                            <Textarea id="bio" name="bio" value={profile.bio ?? ''} onChange={handleInputChange} rows={4} />
                         </div>
                         
                         <div className="space-y-2">
                             <Label htmlFor="currentWork">Current Work</Label>
-                            <Input id="currentWork" name="currentWork" value={profile.currentWork} onChange={handleInputChange} />
+                            <Input id="currentWork" name="currentWork" value={profile.currentWork ?? ''} onChange={handleInputChange} />
                         </div>
                         
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="github">GitHub Profile URL</Label>
-                                <Input id="github" name="github" value={profile.links.github} onChange={handleLinkChange} />
+                                <Input id="github" name="github" value={profile.links?.github ?? ''} onChange={handleLinkChange} />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
-                                <Input id="linkedin" name="linkedin" value={profile.links.linkedin} onChange={handleLinkChange} />
+                                <Input id="linkedin" name="linkedin" value={profile.links?.linkedin ?? ''} onChange={handleLinkChange} />
                             </div>
                         </div>
 
@@ -133,11 +133,11 @@ export default function ProfilePage() {
                             <Input 
                                 id="techStack" 
                                 name="techStack" 
-                                value={profile.techStack.join(', ')} 
+                                value={(profile.techStack ?? []).join(', ')} 
                                 onChange={(e) => handleArrayChange('techStack', e.target.value)}
                             />
                              <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.techStack.filter(Boolean).map((skill) => (
+                                {(profile.techStack ?? []).filter(Boolean).map((skill) => (
                                     <Badge key={skill} variant="secondary">{skill}</Badge>
                                 ))}
                             </div>
@@ -148,11 +148,11 @@ export default function ProfilePage() {
                             <Input 
                                 id="interests" 
                                 name="interests" 
-                                value={profile.interests.join(', ')} 
+                                value={(profile.interests ?? []).join(', ')} 
                                 onChange={(e) => handleArrayChange('interests', e.target.value)}
                             />
                             <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.interests.filter(Boolean).map((interest) => (
+                                {(profile.interests ?? []).filter(Boolean).map((interest) => (
                                     <Badge key={interest} variant="secondary">{interest}</Badge>
                                 ))}
                             </div>
@@ -163,11 +163,11 @@ export default function ProfilePage() {
                             <Input 
                                 id="networkingTags" 
                                 name="networkingTags" 
-                                value={profile.networkingTags.join(', ')} 
+                                value={(profile.networkingTags ?? []).join(', ')} 
                                 onChange={(e) => handleArrayChange('networkingTags', e.target.value)}
                             />
                             <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.networkingTags.filter(Boolean).map((tag) => (
+                                {(profile.networkingTags ?? []).filter(Boolean).map((tag) => (
                                     <Badge key={tag} variant="outline">{tag}</Badge>
                                 ))}
                             </div>
