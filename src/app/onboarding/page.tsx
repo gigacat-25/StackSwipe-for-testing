@@ -71,7 +71,7 @@ export default function OnboardingPage() {
         setStep((prev) => prev - 1);
     };
 
-    const onSubmit: SubmitHandler<FormValues> = (data) => {
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
         if (!user) {
             toast({
                 title: 'Error',
@@ -97,13 +97,21 @@ export default function OnboardingPage() {
             },
         };
         
-        updateProfile(newProfile);
+        try {
+            await updateProfile(newProfile);
+            toast({
+                title: 'Profile Created!',
+                description: "Welcome to StackSwipe! Let's find your next connection.",
+            });
+            router.push('/dashboard');
+        } catch (error) {
+             toast({
+                title: 'Error creating profile',
+                description: 'Could not save your profile. Please try again.',
+                variant: 'destructive',
+            });
+        }
 
-        toast({
-            title: 'Profile Created!',
-            description: "Welcome to StackSwipe! Let's find your next connection.",
-        });
-        router.push('/dashboard');
     };
 
     const progress = ((step + 1) / allSteps.length) * 100;

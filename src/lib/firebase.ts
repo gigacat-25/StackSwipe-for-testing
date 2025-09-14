@@ -1,5 +1,6 @@
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   projectId: 'stackswipe',
@@ -13,3 +14,4 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const firebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+export const db = getFirestore(firebaseApp);

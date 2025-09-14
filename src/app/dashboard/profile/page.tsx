@@ -55,14 +55,22 @@ export default function ProfilePage() {
         setProfile(prev => prev ? ({ ...prev, [field]: value.split(',').map(item => item.trim()) }) : null);
     };
     
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (profile) {
-            updateProfile(profile);
-            toast({
-                title: 'Profile Updated',
-                description: 'Your profile has been saved successfully.',
-            });
+            try {
+                await updateProfile(profile);
+                toast({
+                    title: 'Profile Updated',
+                    description: 'Your profile has been saved successfully.',
+                });
+            } catch (error) {
+                 toast({
+                    title: 'Error updating profile',
+                    description: 'Could not save your profile. Please try again.',
+                    variant: 'destructive',
+                });
+            }
         }
     };
 
