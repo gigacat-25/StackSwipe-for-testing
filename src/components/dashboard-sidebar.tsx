@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   MessageSquare,
   Sparkles,
+  User,
 } from 'lucide-react';
 
 import {
@@ -71,6 +72,20 @@ export function DashboardSidebar() {
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
+         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive('/dashboard/profile')}
+              tooltip={{ children: "Edit Profile", side: 'right' }}
+            >
+              <Link href="/dashboard/profile">
+                <User />
+                <span>Edit Profile</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
