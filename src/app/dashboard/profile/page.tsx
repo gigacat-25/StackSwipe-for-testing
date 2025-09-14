@@ -13,14 +13,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/lib/data';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { User as UserIcon } from 'lucide-react';
 
 export default function ProfilePage() {
     const { profile: initialProfile, updateProfile, loading } = useAuth();
     const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
         setProfile(initialProfile);
+        if (initialProfile?.avatarUrl) {
+            setAvatarPreview(initialProfile.avatarUrl);
+        }
     }, [initialProfile]);
 
     if (loading || !profile) {
@@ -32,6 +38,9 @@ export default function ProfilePage() {
                         <Skeleton className="h-4 w-3/4" />
                     </CardHeader>
                     <CardContent className="space-y-6">
+                         <div className="flex justify-center">
+                            <Skeleton className="h-24 w-24 rounded-full" />
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
                             <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
@@ -50,9 +59,27 @@ export default function ProfilePage() {
         const { name, value } = e.target;
         setProfile(prev => prev ? ({ ...prev, [name]: value }) : null);
     };
+
+    const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setProfile(prev => prev ? ({ ...prev, links: { ...prev.links, [name]: value } }) : null);
+    };
     
     const handleArrayChange = (field: 'techStack' | 'interests' | 'networkingTags', value: string) => {
         setProfile(prev => prev ? ({ ...prev, [field]: value.split(',').map(item => item.trim()) }) : null);
+    };
+
+     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const result = reader.result as string;
+                setAvatarPreview(result);
+                setProfile(prev => prev ? ({ ...prev, avatarUrl: result }) : null);
+            };
+            reader.readAsDataURL(file);
+        }
     };
     
     const handleSubmit = async (e: React.FormEvent) => {
@@ -83,6 +110,17 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="flex flex-col items-center gap-4">
+                            <Avatar className="w-24 h-24">
+                                <AvatarImage src={avatarPreview ?? undefined} />
+                                <AvatarFallback className="text-4xl"><UserIcon /></AvatarFallback>
+                            </Avatar>
+                            <div className="space-y-2 text-center">
+                                <Label htmlFor="avatar">Change Profile Picture</Label>
+                                <Input id="avatar" type="file" accept="image/*" onChange={handleAvatarChange} className="w-full max-w-xs" />
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
@@ -103,6 +141,17 @@ export default function ProfilePage() {
                             <Label htmlFor="currentWork">Current Work</Label>
                             <Input id="currentWork" name="currentWork" value={profile.currentWork} onChange={handleInputChange} />
                         </div>
+                        
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="github">GitHub Profile URL</Label>
+                                <Input id="github" name="github" value={profile.links.github} onChange={handleLinkChange} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
+                                <Input id="linkedin" name="linkedin" value={profile.links.linkedin} onChange={handleLinkChange} />
+                            </div>
+                        </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="techStack">Tech Stack (comma-separated)</Label>
@@ -113,7 +162,7 @@ export default function ProfilePage() {
                                 onChange={(e) => handleArrayChange('techStack', e.target.value)}
                             />
                              <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.techStack.map((skill) => (
+                                {profile.techStack.filter(Boolean).map((skill) => (
                                     <Badge key={skill} variant="secondary">{skill}</Badge>
                                 ))}
                             </div>
@@ -128,7 +177,7 @@ export default function ProfilePage() {
                                 onChange={(e) => handleArrayChange('interests', e.target.value)}
                             />
                             <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.interests.map((interest) => (
+                                {profile.interests.filter(Boolean).map((interest) => (
                                     <Badge key={interest} variant="secondary">{interest}</Badge>
                                 ))}
                             </div>
@@ -140,10 +189,10 @@ export default function ProfilePage() {
                                 id="networkingTags" 
                                 name="networkingTags" 
                                 value={profile.networkingTags.join(', ')} 
-                                onChange={(e) => handleArrayChange('networkingTags', e.target.value as 'networkingTags')}
+                                onChange={(e) => handleArrayChange('networkingTags', e.target.value)}
                             />
                             <div className="flex flex-wrap gap-2 pt-2">
-                                {profile.networkingTags.map((tag) => (
+                                {profile.networkingTags.filter(Boolean).map((tag) => (
                                     <Badge key={tag} variant="outline">{tag}</Badge>
                                 ))}
                             </div>
@@ -158,3 +207,5 @@ export default function ProfilePage() {
         </main>
     );
 }
+
+    

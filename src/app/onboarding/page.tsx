@@ -16,6 +16,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import type { UserProfile } from '@/lib/data';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User as UserIcon } from 'lucide-react';
 
 const profileStepSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -29,6 +31,12 @@ const workStepSchema = z.object({
   interests: z.string().min(2, { message: 'Please add at least one interest.' }),
 });
 
+const socialStepSchema = z.object({
+    github: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
+    linkedin: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
+    avatar: z.any().optional(),
+});
+
 const goalsStepSchema = z.object({
   networkingTags: z.string().min(2, { message: 'Please add at least one goal.' }),
 });
@@ -36,20 +44,23 @@ const goalsStepSchema = z.object({
 const allSteps = [
     { id: 'Step 1', name: 'Profile Basics', fields: ['name', 'headline', 'bio'], schema: profileStepSchema },
     { id: 'Step 2', name: 'Work & Skills', fields: ['currentWork', 'techStack', 'interests'], schema: workStepSchema },
-    { id: 'Step 3', name: 'Networking Goals', fields: ['networkingTags'], schema: goalsStepSchema },
+    { id: 'Step 3', name: 'Links & Picture', fields: ['github', 'linkedin', 'avatar'], schema: socialStepSchema },
+    { id: 'Step 4', name: 'Networking Goals', fields: ['networkingTags'], schema: goalsStepSchema },
 ];
 
 
-type FormValues = z.infer<typeof profileStepSchema> & z.infer<typeof workStepSchema> & z.infer<typeof goalsStepSchema>;
+const fullSchema = profileStepSchema.merge(workStepSchema).merge(socialStepSchema).merge(goalsStepSchema);
+type FormValues = z.infer<typeof fullSchema>;
 
 export default function OnboardingPage() {
     const [step, setStep] = useState(0);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const router = useRouter();
     const { user, updateProfile } = useAuth();
     const { toast } = useToast();
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(allSteps[step].schema),
+        resolver: zodResolver(fullSchema),
         defaultValues: {
             name: '',
             headline: '',
@@ -58,6 +69,8 @@ export default function OnboardingPage() {
             techStack: '',
             interests: '',
             networkingTags: '',
+            github: '',
+            linkedin: '',
         },
     });
 
@@ -72,6 +85,18 @@ export default function OnboardingPage() {
         setStep((prev) => prev - 1);
     };
 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+                form.setValue('avatar', reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         if (!user) {
             toast({
@@ -81,11 +106,11 @@ export default function OnboardingPage() {
             });
             return;
         }
-        
+
         const newProfile: UserProfile = {
             id: user.uid,
             name: data.name,
-            avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`, // Placeholder avatar
+            avatarUrl: (data.avatar as string) || `https://i.pravatar.cc/150?u=${user.uid}`,
             headline: data.headline,
             bio: data.bio,
             currentWork: data.currentWork,
@@ -93,13 +118,13 @@ export default function OnboardingPage() {
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
             networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean),
             links: {
-                github: 'https://github.com',
-                linkedin: 'https://linkedin.com',
+                github: data.github || 'https://github.com',
+                linkedin: data.linkedin || 'https://linkedin.com',
             },
         };
         
         try {
-            await updateProfile(newProfile);
+           await updateProfile(newProfile);
             toast({
                 title: 'Profile Created!',
                 description: "Welcome to StackSwipe! Let's find your next connection.",
@@ -111,8 +136,8 @@ export default function OnboardingPage() {
                 description: 'Could not save your profile. Please try again.',
                 variant: 'destructive',
             });
+             console.error("Profile creation error:", error);
         }
-
     };
 
     const progress = ((step + 1) / allSteps.length) * 100;
@@ -180,7 +205,40 @@ export default function OnboardingPage() {
                                     )} />
                                 </>
                             )}
-                             {step === 2 && (
+                            {step === 2 && (
+                                <>
+                                    <div className="flex flex-col items-center gap-4">
+                                        <Avatar className="w-24 h-24">
+                                            <AvatarImage src={avatarPreview ?? undefined} />
+                                            <AvatarFallback className="text-4xl"><UserIcon /></AvatarFallback>
+                                        </Avatar>
+                                        <FormField control={form.control} name="avatar" render={() => (
+                                            <FormItem>
+                                                <FormLabel>Profile Picture</FormLabel>
+                                                <FormControl>
+                                                    <Input type="file" accept="image/*" onChange={handleAvatarChange} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+                                    <FormField control={form.control} name="github" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>GitHub Profile</FormLabel>
+                                            <FormControl><Input {...field} placeholder="https://github.com/your-username" /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                    <FormField control={form.control} name="linkedin" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>LinkedIn Profile</FormLabel>
+                                            <FormControl><Input {...field} placeholder="https://linkedin.com/in/your-username" /></FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                </>
+                            )}
+                             {step === 3 && (
                                 <>
                                     <FormField control={form.control} name="networkingTags" render={({ field }) => (
                                         <FormItem>
@@ -212,3 +270,5 @@ export default function OnboardingPage() {
         </div>
     );
 }
+
+    
