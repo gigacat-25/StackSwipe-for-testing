@@ -213,7 +213,7 @@ export default function OnboardingPage() {
                                             <FormLabel>Networking Goals (comma-separated)</FormLabel>
                                             <FormControl><Input {...field} placeholder="e.g., Mentor, Teammate, Referrals" /></FormControl>
                                             <FormMessage />
-                                        </Item>
+                                        </FormItem>
                                     )} />
                                 </>
                             )}
