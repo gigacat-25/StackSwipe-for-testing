@@ -1,6 +1,6 @@
 
 export type UserProfile = {
-  id: number;
+  id: string;
   name: string;
   avatarUrl: string;
   headline: string;
@@ -17,7 +17,7 @@ export type UserProfile = {
 
 export const profiles: UserProfile[] = [
   {
-    id: 1,
+    id: "1",
     name: "Alex Morgan",
     avatarUrl: "https://placehold.co/128x128.png",
     headline: "Senior Frontend Engineer @ Innovate Inc.",
@@ -32,7 +32,7 @@ export const profiles: UserProfile[] = [
     },
   },
   {
-    id: 2,
+    id: "2",
     name: "Sam Chen",
     avatarUrl: "https://placehold.co/128x128.png",
     headline: "Backend Developer | Python & Go",
@@ -47,7 +47,7 @@ export const profiles: UserProfile[] = [
     },
   },
   {
-    id: 3,
+    id: "3",
     name: "Jessica Wu",
     avatarUrl: "https://placehold.co/128x128.png",
     headline: "Product Manager | Ex-Founder",
@@ -62,7 +62,7 @@ export const profiles: UserProfile[] = [
     },
   },
   {
-    id: 4,
+    id: "4",
     name: "Ben Carter",
     avatarUrl: "https://placehold.co/128x128.png",
     headline: "Aspiring Software Engineer",
@@ -77,7 +77,7 @@ export const profiles: UserProfile[] = [
     },
   },
    {
-    id: 5,
+    id: "5",
     name: "Chloe Rodriguez",
     avatarUrl: "https://placehold.co/128x128.png",
     headline: "UX/UI Designer",

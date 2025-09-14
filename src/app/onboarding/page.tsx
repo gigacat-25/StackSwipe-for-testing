@@ -82,7 +82,7 @@ export default function OnboardingPage() {
         }
         
         const newProfile = {
-            id: Math.floor(Math.random() * 10000), // temp id
+            id: user.uid,
             name: data.name,
             avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`, // Placeholder avatar
             headline: data.headline,
