@@ -23,7 +23,7 @@ export default function SignupPage() {
         e.preventDefault();
         try {
             await signup(email, password);
-            router.push('/dashboard');
+            router.push('/onboarding');
         } catch (error) {
             console.error('Signup error:', error);
             toast({

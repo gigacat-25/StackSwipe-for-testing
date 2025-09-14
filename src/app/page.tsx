@@ -7,17 +7,21 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function HomePage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, hasProfile } = useAuth();
 
   useEffect(() => {
     if (!loading) {
       if (user) {
-        router.replace('/dashboard');
+        if (hasProfile) {
+            router.replace('/dashboard');
+        } else {
+            router.replace('/onboarding');
+        }
       } else {
         router.replace('/login');
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, hasProfile, router]);
 
   return (
     <div className="flex h-screen items-center justify-center">
