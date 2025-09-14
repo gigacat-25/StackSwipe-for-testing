@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { firebaseApp, db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import type { UserProfile } from '@/lib/data';
@@ -33,46 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+            setLoading(true);
             setUser(user);
             if (user) {
                 const profileDoc = await getDoc(doc(db, 'users', user.uid));
                 if (profileDoc.exists()) {
                     setProfile(profileDoc.data() as UserProfile);
                     setHasProfile(true);
-                    
-                    const q = query(collection(db, "matches"), where("userIds", "array-contains", user.uid));
-                    const querySnapshot = await getDocs(q);
-                    const userMatches: Match[] = [];
-                    const matchedUserIds = new Set<string>();
-
-                    querySnapshot.forEach((doc) => {
-                        const matchData = doc.data() as Match;
-                        userMatches.push(matchData);
-                        matchData.userIds.forEach(id => {
-                            if (id !== user.uid) {
-                                matchedUserIds.add(id);
-                            }
-                        });
-                    });
-
-                    if (matchedUserIds.size > 0) {
-                        const usersQuery = query(collection(db, "users"), where("id", "in", Array.from(matchedUserIds)));
-                        const usersSnapshot = await getDocs(usersQuery);
-                        const matchedUserProfiles = new Map<string, UserProfile>();
-                        usersSnapshot.forEach(doc => {
-                            const userData = doc.data() as UserProfile;
-                            matchedUserProfiles.set(userData.id, userData);
-                        });
-
-                        const enrichedMatches = userMatches.map(match => ({
-                            ...match,
-                            users: match.userIds.map(id => matchedUserProfiles.get(id)).filter(Boolean) as UserProfile[]
-                        }));
-                        setMatches(enrichedMatches);
-                    } else {
-                         setMatches([]);
-                    }
                 } else {
                     setProfile(null);
                     setHasProfile(false);
@@ -86,8 +54,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setLoading(false);
         });
 
-        return () => unsubscribe();
+        return () => unsubscribeAuth();
     }, [auth]);
+
+    useEffect(() => {
+        if (!user) {
+            setMatches([]);
+            return;
+        };
+
+        const q = query(collection(db, "matches"), where("userIds", "array-contains", user.uid));
+        
+        const unsubscribeMatches = onSnapshot(q, async (querySnapshot) => {
+            const userMatches: Match[] = [];
+            const matchedUserIds = new Set<string>();
+
+            querySnapshot.forEach((doc) => {
+                const matchData = doc.data() as Match;
+                userMatches.push(matchData);
+                matchData.userIds.forEach(id => {
+                    // Add both user IDs to the set to fetch all profiles in one go
+                    matchedUserIds.add(id);
+                });
+            });
+
+            if (matchedUserIds.size > 0) {
+                const usersQuery = query(collection(db, "users"), where("id", "in", Array.from(matchedUserIds)));
+                const usersSnapshot = await getDocs(usersQuery);
+                const matchedUserProfiles = new Map<string, UserProfile>();
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data() as UserProfile;
+                    matchedUserProfiles.set(userData.id, userData);
+                });
+
+                const enrichedMatches = userMatches.map(match => ({
+                    ...match,
+                    users: match.userIds.map(id => matchedUserProfiles.get(id)).filter(Boolean) as UserProfile[]
+                }));
+                setMatches(enrichedMatches);
+            } else {
+                 setMatches([]);
+            }
+        });
+
+        return () => unsubscribeMatches();
+
+    }, [user]);
 
     const login = (email: string, pass: string) => {
         return signInWithEmailAndPassword(auth, email, pass);
@@ -123,3 +135,5 @@ export const useAuth = () => {
     }
     return context;
 };
+
+    

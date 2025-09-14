@@ -75,10 +75,13 @@ export default function MessagesPage() {
     if (convSnap.exists()) {
         conversationData = { id: convSnap.id, ...(convSnap.data() as Omit<Conversation, 'id'>) };
     } else {
+        // Find the full UserProfile object for the current user from the `matches` prop, since useAuth doesn't expose it directly
+        const currentUserProfile = match.users?.find(u => u.id === user.uid);
+
         conversationData = {
             id: convId,
             userIds: [user.uid, otherUser.id],
-            users: [ (await getDoc(doc(db, 'users', user.uid))).data() as UserProfile, otherUser],
+            users: [ currentUserProfile!, otherUser],
             messages: []
         };
         await setDoc(convRef, { userIds: conversationData.userIds, users: conversationData.users });
@@ -124,7 +127,7 @@ export default function MessagesPage() {
               {matches.length === 0 && <div className="p-4 text-center text-muted-foreground">No matches yet. Keep swiping!</div>}
               {matches.map((match) => {
                   const matchUser = match.users?.find(u => u.id !== user?.uid);
-                  if (!matchUser) return null;
+                  if (!matchUser || matchUser.id === user?.uid) return null;
                   const convId = getConversationId(user!.uid, matchUser.id);
                   return (
                     <button
@@ -165,10 +168,11 @@ export default function MessagesPage() {
                       {!loadingMessages && messages.length === 0 && <div className="text-center text-muted-foreground">This is the beginning of your conversation. Say hi!</div>}
                       {messages.map((message) => {
                           const senderIsMe = message.senderId === user?.uid;
-                          const messageSender = senderIsMe ? user : otherUser;
+                          const messageSenderProfile = activeConversation.users.find(u => u.id === message.senderId);
+
                           return (
                               <div key={message.id} className={cn('flex items-end gap-2', senderIsMe ? 'justify-end' : 'justify-start')}>
-                                  {!senderIsMe && <Avatar className="h-8 w-8"><AvatarFallback>{messageSender?.name.charAt(0)}</AvatarFallback></Avatar>}
+                                  {!senderIsMe && <Avatar className="h-8 w-8"><AvatarFallback>{messageSenderProfile?.name.charAt(0)}</AvatarFallback></Avatar>}
                                   <div className={cn(
                                       "max-w-xs md:max-w-md lg:max-w-lg rounded-xl px-4 py-2", 
                                       senderIsMe ? 'bg-primary text-primary-foreground' : 'bg-secondary'
@@ -209,3 +213,5 @@ export default function MessagesPage() {
     </div>
   );
 }
+
+    
