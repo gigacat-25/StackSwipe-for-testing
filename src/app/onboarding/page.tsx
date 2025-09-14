@@ -101,8 +101,8 @@ export default function OnboardingPage() {
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
             networkingTags: (data.networkingTags || '').split(',').map(item => item.trim()).filter(Boolean),
             links: {
-                github: data.github || 'https://github.com',
-                linkedin: data.linkedin || 'https://linkedin.com',
+                github: data.github || '',
+                linkedin: data.linkedin || '',
             },
         };
         
