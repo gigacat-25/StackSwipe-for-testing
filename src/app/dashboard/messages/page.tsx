@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Search } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Send, Search, User as UserIcon } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -58,7 +58,6 @@ export default function MessagesPage() {
                   )}
                 >
                   <Avatar>
-                    <AvatarImage src={convo.contactAvatarUrl} />
                     <AvatarFallback>{convo.contactName.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 truncate">
@@ -75,7 +74,6 @@ export default function MessagesPage() {
       <Card className="md:col-span-8 lg:col-span-9 flex flex-col h-full">
           <CardHeader className="flex flex-row items-center gap-4 p-4 border-b">
              <Avatar>
-                <AvatarImage src={activeConversation.contactAvatarUrl} />
                 <AvatarFallback>{activeConversation.contactName.charAt(0)}</AvatarFallback>
             </Avatar>
             <h2 className="text-lg font-semibold">{activeConversation.contactName}</h2>
@@ -85,7 +83,7 @@ export default function MessagesPage() {
               <div className="space-y-4">
                   {messages.map((message) => (
                       <div key={message.id} className={cn('flex items-end gap-2', message.sender === 'me' ? 'justify-end' : 'justify-start')}>
-                          {message.sender === 'them' && <Avatar className="h-8 w-8"><AvatarImage src={activeConversation.contactAvatarUrl} /></Avatar>}
+                          {message.sender === 'them' && <Avatar className="h-8 w-8"><AvatarFallback>{activeConversation.contactName.charAt(0)}</AvatarFallback></Avatar>}
                           <div className={cn(
                               "max-w-xs md:max-w-md lg:max-w-lg rounded-xl px-4 py-2", 
                               message.sender === 'me' ? 'bg-primary text-primary-foreground' : 'bg-secondary'

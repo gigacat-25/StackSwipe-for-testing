@@ -23,7 +23,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 
 const menuItems = [
@@ -80,7 +80,6 @@ export function DashboardSidebar() {
             <SidebarMenuItem>
                <div className="flex items-center gap-3 p-2">
                   <Avatar className="size-8">
-                      <AvatarImage src={profile.avatarUrl ?? undefined} />
                       <AvatarFallback>{profile.name?.[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="truncate text-sm font-medium">{profile.name}</span>

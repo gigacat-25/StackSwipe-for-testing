@@ -12,7 +12,7 @@ import { postChatMessage } from '@/actions/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -192,7 +192,6 @@ export default function RecommendationsPage() {
                                     </div>
                                     {message.sender === 'user' && (
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src={currentUser?.avatarUrl} />
                                             <AvatarFallback><User /></AvatarFallback>
                                         </Avatar>
                                     )}

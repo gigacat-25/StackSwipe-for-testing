@@ -12,7 +12,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/lib/data';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { User as UserIcon } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -92,13 +91,6 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex flex-col items-center gap-4">
-                            <Avatar className="w-24 h-24">
-                                <AvatarImage src={profile.avatarUrl ?? undefined} />
-                                <AvatarFallback className="text-4xl"><UserIcon /></AvatarFallback>
-                            </Avatar>
-                        </div>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>

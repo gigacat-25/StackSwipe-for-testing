@@ -93,7 +93,6 @@ export default function OnboardingPage() {
         const newProfile: UserProfile = {
             id: user.uid,
             name: data.name,
-            avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`,
             headline: data.headline,
             bio: data.bio,
             currentWork: data.currentWork,
