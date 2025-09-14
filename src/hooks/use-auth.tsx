@@ -67,33 +67,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         const unsubscribeMatches = onSnapshot(q, async (querySnapshot) => {
             const userMatches: Match[] = [];
-            const matchedUserIds = new Set<string>();
-
-            querySnapshot.forEach((doc) => {
-                const matchData = doc.data() as Match;
-                userMatches.push(matchData);
-                matchData.userIds.forEach(id => {
-                    // Add both user IDs to the set to fetch all profiles in one go
-                    matchedUserIds.add(id);
-                });
+            const userIdsInMatches = new Set<string>();
+        
+            querySnapshot.forEach(doc => {
+                const match = doc.data() as Match;
+                userMatches.push(match);
+                match.userIds.forEach(id => userIdsInMatches.add(id));
             });
-
-            if (matchedUserIds.size > 0) {
-                const usersQuery = query(collection(db, "users"), where("id", "in", Array.from(matchedUserIds)));
-                const usersSnapshot = await getDocs(usersQuery);
-                const matchedUserProfiles = new Map<string, UserProfile>();
-                usersSnapshot.forEach(doc => {
-                    const userData = doc.data() as UserProfile;
-                    matchedUserProfiles.set(userData.id, userData);
+        
+            if (userIdsInMatches.size > 0) {
+                const profilesMap = new Map<string, UserProfile>();
+                // To avoid a large "in" query, fetch profiles as needed or paginate
+                const profilesQuery = query(collection(db, "users"), where("id", "in", Array.from(userIdsInMatches)));
+                const profileSnapshots = await getDocs(profilesQuery);
+                profileSnapshots.forEach(doc => {
+                    profilesMap.set(doc.id, doc.data() as UserProfile);
                 });
-
+        
                 const enrichedMatches = userMatches.map(match => ({
                     ...match,
-                    users: match.userIds.map(id => matchedUserProfiles.get(id)).filter(Boolean) as UserProfile[]
+                    users: match.userIds.map(id => profilesMap.get(id)).filter(Boolean) as UserProfile[]
                 }));
                 setMatches(enrichedMatches);
             } else {
-                 setMatches([]);
+                setMatches([]);
             }
         });
 

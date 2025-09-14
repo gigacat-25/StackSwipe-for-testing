@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -11,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { type Conversation, type Message, type UserProfile, type Match } from '@/lib/data';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { collection, doc, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDoc, setDoc, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Timestamp } from 'firebase/firestore';
 
@@ -63,10 +64,26 @@ export default function MessagesPage() {
 
   const handleSelectConversation = async (match: Match) => {
     if (!user) return;
-    const otherUser = match.users?.find(u => u.id !== user.uid);
-    if (!otherUser) return;
+    
+    // Find the other user's ID
+    const otherUserId = match.userIds.find(id => id !== user.uid);
+    if (!otherUserId) return;
 
-    const convId = getConversationId(user.uid, otherUser.id);
+    // Fetch both user profiles
+    const userIds = [user.uid, otherUserId];
+    const usersQuery = query(collection(db, "users"), where("id", "in", userIds));
+    const usersSnapshot = await getDocs(usersQuery);
+    const userProfiles = usersSnapshot.docs.map(doc => doc.data() as UserProfile);
+
+    const currentUserProfile = userProfiles.find(p => p.id === user.uid);
+    const otherUserProfile = userProfiles.find(p => p.id === otherUserId);
+    
+    if (!currentUserProfile || !otherUserProfile) {
+        console.error("Could not find profiles for conversation");
+        return;
+    }
+
+    const convId = getConversationId(user.uid, otherUserId);
     const convRef = doc(db, 'chats', convId);
     const convSnap = await getDoc(convRef);
 
@@ -74,14 +91,13 @@ export default function MessagesPage() {
 
     if (convSnap.exists()) {
         conversationData = { id: convSnap.id, ...(convSnap.data() as Omit<Conversation, 'id'>) };
+        // Ensure user data is up-to-date in conversation
+        conversationData.users = [currentUserProfile, otherUserProfile];
     } else {
-        // Find the full UserProfile object for the current user from the `matches` prop, since useAuth doesn't expose it directly
-        const currentUserProfile = match.users?.find(u => u.id === user.uid);
-
         conversationData = {
             id: convId,
-            userIds: [user.uid, otherUser.id],
-            users: [ currentUserProfile!, otherUser],
+            userIds: [user.uid, otherUserId],
+            users: [ currentUserProfile, otherUserProfile],
             messages: []
         };
         await setDoc(convRef, { userIds: conversationData.userIds, users: conversationData.users });
