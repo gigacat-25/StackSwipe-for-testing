@@ -38,7 +38,7 @@ const menuItems = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { profile, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -76,6 +76,17 @@ export function DashboardSidebar() {
       <SidebarSeparator />
       <SidebarFooter>
          <SidebarMenu>
+           {profile && (
+            <SidebarMenuItem>
+               <div className="flex items-center gap-3 p-2">
+                  <Avatar className="size-8">
+                      <AvatarImage src={profile.avatarUrl ?? undefined} />
+                      <AvatarFallback>{profile.name?.[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className="truncate text-sm font-medium">{profile.name}</span>
+               </div>
+            </SidebarMenuItem>
+           )}
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -88,17 +99,6 @@ export function DashboardSidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-           {user && (
-            <SidebarMenuItem>
-               <div className="flex items-center gap-3 p-2">
-                  <Avatar className="size-8">
-                      <AvatarImage src={user.photoURL ?? undefined} />
-                      <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className="truncate text-sm font-medium">{user.email}</span>
-               </div>
-            </SidebarMenuItem>
-           )}
           <SidebarMenuItem>
             <SidebarMenuButton
                 onClick={logout}
