@@ -1,6 +1,7 @@
 
+
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, Bot, User, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import { currentUser } from '@/lib/data';
+import { useAuth } from '@/hooks/use-auth';
 
 type ChatMessage = {
     sender: 'user' | 'bot';
@@ -21,13 +22,9 @@ type ChatMessage = {
 };
 
 export default function RecommendationsPage() {
+    const { profile: currentUser, loading: authLoading } = useAuth();
     const [networkingGoals, setNetworkingGoals] = useState('Find a mentor in frontend development and connect with potential teammates for a side project.');
-    const [profileDetails] = useState(JSON.stringify({
-        headline: currentUser.headline,
-        bio: currentUser.bio,
-        techStack: currentUser.techStack,
-        interests: currentUser.interests,
-    }, null, 2));
+    const [profileDetails, setProfileDetails] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -37,6 +34,17 @@ export default function RecommendationsPage() {
     const [chatError, setChatError] = useState<string | null>(null);
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
     const [chatInput, setChatInput] = useState('');
+
+    useEffect(() => {
+        if (currentUser) {
+            setProfileDetails(JSON.stringify({
+                headline: currentUser.headline,
+                bio: currentUser.bio,
+                techStack: currentUser.techStack,
+                interests: currentUser.interests,
+            }, null, 2));
+        }
+    }, [currentUser]);
 
 
     const handleGetRecommendations = async (e: React.FormEvent) => {
@@ -92,32 +100,40 @@ export default function RecommendationsPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleGetRecommendations} className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="networking-goals">Your Networking Goals</Label>
-                                    <Textarea
-                                        id="networking-goals"
-                                        value={networkingGoals}
-                                        onChange={(e) => setNetworkingGoals(e.target.value)}
-                                        placeholder="e.g., Find a mentor, look for job referrals, connect with other developers..."
-                                        rows={3}
-                                    />
+                             {authLoading ? (
+                                <div className="space-y-4">
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-32 w-full" />
+                                    <Skeleton className="h-10 w-40" />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="profile-details">Your Profile Details</Label>
-                                    <Textarea
-                                        id="profile-details"
-                                        value={profileDetails}
-                                        readOnly
-                                        rows={8}
-                                        className="bg-muted font-code text-xs"
-                                    />
-                                    <p className="text-xs text-muted-foreground">This is based on your current profile.</p>
-                                </div>
-                                <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-                                    {loading ? 'Getting Recommendations...' : 'Get Recommendations'}
-                                </Button>
-                            </form>
+                            ) : (
+                                <form onSubmit={handleGetRecommendations} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="networking-goals">Your Networking Goals</Label>
+                                        <Textarea
+                                            id="networking-goals"
+                                            value={networkingGoals}
+                                            onChange={(e) => setNetworkingGoals(e.target.value)}
+                                            placeholder="e.g., Find a mentor, look for job referrals, connect with other developers..."
+                                            rows={3}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="profile-details">Your Profile Details</Label>
+                                        <Textarea
+                                            id="profile-details"
+                                            value={profileDetails}
+                                            readOnly
+                                            rows={8}
+                                            className="bg-muted font-code text-xs"
+                                        />
+                                        <p className="text-xs text-muted-foreground">This is based on your current profile.</p>
+                                    </div>
+                                    <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+                                        {loading ? 'Getting Recommendations...' : 'Get Recommendations'}
+                                    </Button>
+                                </form>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -176,7 +192,7 @@ export default function RecommendationsPage() {
                                     </div>
                                     {message.sender === 'user' && (
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src={currentUser.avatarUrl} />
+                                            <AvatarImage src={currentUser?.avatarUrl} />
                                             <AvatarFallback><User /></AvatarFallback>
                                         </Avatar>
                                     )}

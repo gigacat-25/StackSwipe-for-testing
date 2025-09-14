@@ -2,8 +2,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import { currentUser, type UserProfile } from '@/lib/data';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,30 +11,59 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { UserProfile } from '@/lib/data';
 
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<UserProfile>(currentUser);
+    const { profile: initialProfile, updateProfile, loading } = useAuth();
+    const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
     const { toast } = useToast();
+
+    useEffect(() => {
+        setProfile(initialProfile);
+    }, [initialProfile]);
+
+    if (loading || !profile) {
+        return (
+             <main className="container mx-auto p-4 md:p-8">
+                 <Card className="max-w-3xl mx-auto">
+                    <CardHeader>
+                        <Skeleton className="h-8 w-1/2" />
+                        <Skeleton className="h-4 w-3/4" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                            <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                        </div>
+                        <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-20 w-full" /></div>
+                        <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                        <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                        <div className="flex justify-end"><Skeleton className="h-10 w-24" /></div>
+                    </CardContent>
+                 </Card>
+             </main>
+        );
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setProfile(prev => ({ ...prev, [name]: value }));
+        setProfile(prev => prev ? ({ ...prev, [name]: value }) : null);
     };
     
     const handleArrayChange = (field: 'techStack' | 'interests' | 'networkingTags', value: string) => {
-        setProfile(prev => ({ ...prev, [field]: value.split(',').map(item => item.trim()) }));
+        setProfile(prev => prev ? ({ ...prev, [field]: value.split(',').map(item => item.trim()) }) : null);
     };
     
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, you'd save this data to a backend.
-        // For this demo, we'll just show a toast.
-        console.log('Updated Profile:', profile);
-        toast({
-            title: 'Profile Updated',
-            description: 'Your profile has been saved successfully.',
-        });
+        if (profile) {
+            updateProfile(profile);
+            toast({
+                title: 'Profile Updated',
+                description: 'Your profile has been saved successfully.',
+            });
+        }
     };
 
     return (

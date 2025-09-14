@@ -44,7 +44,7 @@ type FormValues = z.infer<typeof profileStepSchema> & z.infer<typeof workStepSch
 export default function OnboardingPage() {
     const [step, setStep] = useState(0);
     const router = useRouter();
-    const { user, setHasProfile } = useAuth();
+    const { user, updateProfile } = useAuth();
     const { toast } = useToast();
 
     const form = useForm<FormValues>({
@@ -72,14 +72,32 @@ export default function OnboardingPage() {
     };
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
-        // In a real app, you'd save this data to your database, linking it to the user.
-        console.log('Onboarding Complete:', data);
-        
-        // For this demo, we'll mark the profile as complete in localStorage.
-        if(user) {
-            localStorage.setItem(`profile_${user.uid}`, 'true');
+        if (!user) {
+            toast({
+                title: 'Error',
+                description: 'You must be logged in to create a profile.',
+                variant: 'destructive',
+            });
+            return;
         }
-        setHasProfile(true);
+        
+        const newProfile = {
+            id: Math.floor(Math.random() * 10000), // temp id
+            name: data.name,
+            avatarUrl: `https://i.pravatar.cc/150?u=${user.uid}`, // Placeholder avatar
+            headline: data.headline,
+            bio: data.bio,
+            currentWork: data.currentWork,
+            techStack: data.techStack.split(',').map(item => item.trim()),
+            interests: data.interests.split(',').map(item => item.trim()),
+            networkingTags: data.networkingTags.split(',').map(item => item.trim()) as any,
+            links: {
+                github: 'https://github.com',
+                linkedin: 'https://linkedin.com',
+            },
+        };
+        
+        updateProfile(newProfile);
 
         toast({
             title: 'Profile Created!',

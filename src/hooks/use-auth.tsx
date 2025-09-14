@@ -5,12 +5,16 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { firebaseApp } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import type { UserProfile } from '@/lib/data';
+import { profiles } from '@/lib/data';
 
 interface AuthContextType {
     user: User | null;
     loading: boolean;
+    profile: UserProfile | null;
     hasProfile: boolean;
     setHasProfile: (hasProfile: boolean) => void;
+    updateProfile: (profile: UserProfile) => void;
     login: (email: string, pass: string) => Promise<any>;
     signup: (email: string, pass: string) => Promise<any>;
     logout: () => Promise<void>;
@@ -22,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [hasProfile, setHasProfile] = useState(false);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const auth = getAuth(firebaseApp);
     const router = useRouter();
 
@@ -29,12 +34,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setUser(user);
             if (user) {
-                // In a real app, you would check if a user profile exists in your database.
-                // For now, we'll use localStorage to persist the profile status for this demo.
                 const profileExists = localStorage.getItem(`profile_${user.uid}`) === 'true';
                 setHasProfile(profileExists);
+                if (profileExists) {
+                    const storedProfile = localStorage.getItem(`profile_data_${user.uid}`);
+                    if (storedProfile) {
+                        setProfile(JSON.parse(storedProfile));
+                    }
+                } else {
+                    setProfile(null);
+                }
             } else {
                 setHasProfile(false);
+                setProfile(null);
             }
             setLoading(false);
         });
@@ -47,21 +59,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const signup = (email: string, pass: string) => {
-        // When signing up, we know the profile doesn't exist yet.
         setHasProfile(false);
         return createUserWithEmailAndPassword(auth, email, pass);
+    };
+    
+    const updateProfile = (newProfile: UserProfile) => {
+        if(user) {
+            localStorage.setItem(`profile_data_${user.uid}`, JSON.stringify(newProfile));
+            setProfile(newProfile);
+            if (!hasProfile) {
+                localStorage.setItem(`profile_${user.uid}`, 'true');
+                setHasProfile(true);
+            }
+        }
     };
 
     const logout = async () => {
         await signOut(auth);
-        // Clear local profile status on logout
         if (user) {
              localStorage.removeItem(`profile_${user.uid}`);
+             localStorage.removeItem(`profile_data_${user.uid}`);
         }
         router.push('/login');
     };
 
-    const value = { user, loading, hasProfile, setHasProfile, login, signup, logout };
+    const value = { user, loading, profile, hasProfile, setHasProfile, updateProfile, login, signup, logout };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
