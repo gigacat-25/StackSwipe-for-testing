@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Send, Search, User as UserIcon } from 'lucide-react';
+import { Send, Search } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ function getConversationId(userId1: string, userId2: string) {
 
 
 export default function MessagesPage() {
-  const { user, matches, loading: authLoading } = useAuth();
+  const { user, matches, setMatches, loading: authLoading } = useAuth();
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -31,10 +31,56 @@ export default function MessagesPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!user) {
+        setMatches([]);
+        return;
+    };
+
+    const q = query(collection(db, "matches"), where("userIds", "array-contains", user.uid));
+    
+    const unsubscribeMatches = onSnapshot(q, async (querySnapshot) => {
+        const userMatches: Match[] = [];
+        const userIdsInMatches = new Set<string>();
+    
+        querySnapshot.forEach(doc => {
+            const match = doc.data() as Match;
+            userMatches.push(match);
+            match.userIds.forEach(id => userIdsInMatches.add(id));
+        });
+    
+        if (userIdsInMatches.size > 0) {
+            const profilesMap = new Map<string, UserProfile>();
+            const profilesQuery = query(collection(db, "users"), where("id", "in", Array.from(userIdsInMatches)));
+            const profileSnapshots = await getDocs(profilesQuery);
+            profileSnapshots.forEach(doc => {
+                profilesMap.set(doc.id, doc.data() as UserProfile);
+            });
+    
+            const enrichedMatches = userMatches.map(match => ({
+                ...match,
+                users: match.userIds.map(id => profilesMap.get(id)).filter(Boolean) as UserProfile[]
+            }));
+            setMatches(enrichedMatches);
+        } else {
+            setMatches([]);
+        }
+    });
+
+    return () => unsubscribeMatches();
+
+  }, [user, setMatches]);
+
+  useEffect(() => {
     if (!activeConversation) return;
 
     setLoadingMessages(true);
-    const convId = getConversationId(user!.uid, activeConversation.users.find(u => u.id !== user!.uid)!.id);
+    const otherUserId = activeConversation.users.find(u => u.id !== user!.uid)?.id;
+    if (!otherUserId) {
+        setLoadingMessages(false);
+        return;
+    }
+
+    const convId = getConversationId(user!.uid, otherUserId);
     const messagesQuery = query(collection(db, 'chats', convId, 'messages'), orderBy('timestamp', 'asc'));
 
     const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
@@ -65,18 +111,11 @@ export default function MessagesPage() {
   const handleSelectConversation = async (match: Match) => {
     if (!user) return;
     
-    // Find the other user's ID
     const otherUserId = match.userIds.find(id => id !== user.uid);
     if (!otherUserId) return;
-
-    // Fetch both user profiles
-    const userIds = [user.uid, otherUserId];
-    const usersQuery = query(collection(db, "users"), where("id", "in", userIds));
-    const usersSnapshot = await getDocs(usersQuery);
-    const userProfiles = usersSnapshot.docs.map(doc => doc.data() as UserProfile);
-
-    const currentUserProfile = userProfiles.find(p => p.id === user.uid);
-    const otherUserProfile = userProfiles.find(p => p.id === otherUserId);
+    
+    const currentUserProfile = match.users?.find(p => p.id === user.uid);
+    const otherUserProfile = match.users?.find(p => p.id === otherUserId);
     
     if (!currentUserProfile || !otherUserProfile) {
         console.error("Could not find profiles for conversation");
@@ -91,7 +130,6 @@ export default function MessagesPage() {
 
     if (convSnap.exists()) {
         conversationData = { id: convSnap.id, ...(convSnap.data() as Omit<Conversation, 'id'>) };
-        // Ensure user data is up-to-date in conversation
         conversationData.users = [currentUserProfile, otherUserProfile];
     } else {
         conversationData = {
@@ -100,7 +138,7 @@ export default function MessagesPage() {
             users: [ currentUserProfile, otherUserProfile],
             messages: []
         };
-        await setDoc(convRef, { userIds: conversationData.userIds, users: conversationData.users });
+        await setDoc(convRef, { userIds: conversationData.userIds });
     }
     
     setActiveConversation(conversationData);
@@ -109,8 +147,11 @@ export default function MessagesPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '' || !activeConversation || !user) return;
+
+    const otherUserId = activeConversation.users.find(u => u.id !== user!.uid)?.id;
+    if(!otherUserId) return;
     
-    const convId = getConversationId(user.uid, activeConversation.users.find(u => u.id !== user!.uid)!.id);
+    const convId = getConversationId(user.uid, otherUserId);
     const messagesCollection = collection(db, 'chats', convId, 'messages');
 
     await addDoc(messagesCollection, {
@@ -143,8 +184,8 @@ export default function MessagesPage() {
               {matches.length === 0 && <div className="p-4 text-center text-muted-foreground">No matches yet. Keep swiping!</div>}
               {matches.map((match) => {
                   const matchUser = match.users?.find(u => u.id !== user?.uid);
-                  if (!matchUser || matchUser.id === user?.uid) return null;
-                  const convId = getConversationId(user!.uid, matchUser.id);
+                  if (!user || !matchUser || matchUser.id === user?.uid) return null;
+                  const convId = getConversationId(user.uid, matchUser.id);
                   return (
                     <button
                       key={match.id}
@@ -229,5 +270,3 @@ export default function MessagesPage() {
     </div>
   );
 }
-
-    
