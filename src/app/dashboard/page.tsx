@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { db } from '@/lib/firebase';
@@ -29,28 +29,33 @@ const SWIPE_LIMIT = 10;
 
 export default function SwipePage() {
   const { user } = useAuth();
-  const [profiles, setProfiles] = useState<UserProfile[]>([]);
+  const [allProfiles, setAllProfiles] = useState<UserProfile[]>([]);
+  const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [swipedIds, setSwipedIds] = useState<Set<string>>(new Set());
   const [swipes, setSwipes] = useState(0);
   const [swipeAnimation, setSwipeAnimation] = useState<'left' | 'right' | ''>('');
   const { toast } = useToast();
+  
+  const [locationFilter, setLocationFilter] = useState('');
+  const [techStackFilter, setTechStackFilter] = useState('');
+
 
   useEffect(() => {
     async function fetchProfiles() {
       if (!user) return;
       try {
         setLoading(true);
-        // Fetch users that the current user has already swiped on
         const swipesQuery = query(collection(db, 'swipes'), where('swiperId', '==', user.uid));
         const swipesSnapshot = await getDocs(swipesQuery);
         const alreadySwipedIds = new Set(swipesSnapshot.docs.map(doc => doc.data().swipedId));
+        setSwipedIds(alreadySwipedIds);
         
-        const allProfiles = await getAllUsers();
-        // Filter out the current user's profile and profiles they've already swiped
-        const filteredProfiles = allProfiles.filter(p => p.id !== user.uid && !alreadySwipedIds.has(p.id));
-        setProfiles(filteredProfiles);
+        const profiles = await getAllUsers();
+        const availableProfiles = profiles.filter(p => p.id !== user.uid && !alreadySwipedIds.has(p.id));
+        setAllProfiles(availableProfiles);
+        setFilteredProfiles(availableProfiles);
 
       } catch (error) {
         console.error("Failed to fetch profiles:", error);
@@ -66,10 +71,31 @@ export default function SwipePage() {
     fetchProfiles();
   }, [user, toast]);
 
+  const handleApplyFilters = () => {
+    let profiles = [...allProfiles];
+
+    if (locationFilter.trim()) {
+        profiles = profiles.filter(p => p.location?.toLowerCase().includes(locationFilter.toLowerCase()));
+    }
+
+    if (techStackFilter.trim()) {
+        const skills = techStackFilter.toLowerCase().split(',').map(s => s.trim());
+        profiles = profiles.filter(p => 
+            p.techStack.some(skill => skills.includes(skill.toLowerCase()))
+        );
+    }
+    
+    setFilteredProfiles(profiles);
+    setCurrentIndex(0); // Reset swipe index to start from the beginning of the filtered list
+    toast({
+        title: 'Filters Applied',
+        description: `Showing ${profiles.length} matching profiles.`,
+    });
+  };
+
   const checkForMatch = async (swipedProfile: UserProfile) => {
     if (!user) return;
 
-    // Check if the other person has liked the current user
     const q = query(
       collection(db, "swipes"),
       where("swiperId", "==", swipedProfile.id),
@@ -79,13 +105,11 @@ export default function SwipePage() {
 
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.empty) {
-      // It's a match!
       console.log(`It's a match with ${swipedProfile.name}!`);
       toast({
         title: `It's a match!`,
         description: `You and ${swipedProfile.name} have liked each other.`,
       });
-      // Create a match document
       const matchId = [user.uid, swipedProfile.id].sort().join('_');
       await setDoc(doc(db, "matches", matchId), {
         id: matchId,
@@ -96,7 +120,7 @@ export default function SwipePage() {
   };
 
   const handleSwipe = async (action: 'like' | 'dislike') => {
-    if (!user || !profiles[currentIndex]) return;
+    if (!user || !filteredProfiles[currentIndex]) return;
     if (swipes >= SWIPE_LIMIT) {
       toast({
         title: 'Daily limit reached',
@@ -106,12 +130,11 @@ export default function SwipePage() {
       return;
     }
     
-    const swipedProfile = profiles[currentIndex];
+    const swipedProfile = filteredProfiles[currentIndex];
     
     setSwipeAnimation(action === 'like' ? 'right' : 'left');
     
     try {
-        // Record the swipe in Firestore
         await addDoc(collection(db, 'swipes'), {
             swiperId: user.uid,
             swipedId: swipedProfile.id,
@@ -119,7 +142,6 @@ export default function SwipePage() {
             timestamp: serverTimestamp(),
         });
         
-        // Add the swiped profile ID to the set of swiped IDs
         setSwipedIds(prev => new Set(prev).add(swipedProfile.id));
 
         if (action === 'like') {
@@ -129,10 +151,9 @@ export default function SwipePage() {
     } catch (error) {
          console.error("Error recording swipe:", error);
          toast({ title: 'Error', description: 'Could not save your swipe.', variant: 'destructive'});
-         setSwipeAnimation(''); // Reset animation on error
-         return; // Don't proceed
+         setSwipeAnimation('');
+         return;
     }
-
 
     setTimeout(() => {
       toast({
@@ -146,8 +167,6 @@ export default function SwipePage() {
   };
   
   const handleUndo = () => {
-    // Note: A true undo would require deleting the swipe from Firestore.
-    // This is a simplified version for UI only.
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
       if(swipes > 0) setSwipes(swipes - 1);
@@ -155,7 +174,7 @@ export default function SwipePage() {
     }
   };
 
-  const currentProfile = profiles[currentIndex];
+  const currentProfile = filteredProfiles[currentIndex];
   const limitReached = swipes >= SWIPE_LIMIT;
   const noMoreProfiles = !currentProfile && !loading;
 
@@ -187,13 +206,25 @@ export default function SwipePage() {
                     <div className="py-4 space-y-4">
                         <div>
                             <Label htmlFor="location">Location</Label>
-                            <Input id="location" placeholder="e.g., San Francisco, CA" />
+                            <Input 
+                                id="location" 
+                                placeholder="e.g., San Francisco, CA" 
+                                value={locationFilter}
+                                onChange={(e) => setLocationFilter(e.target.value)}
+                            />
                         </div>
                         <div>
-                            <Label htmlFor="tech-stack">Tech Stack</Label>
-                            <Input id="tech-stack" placeholder="e.g., React, Python" />
+                            <Label htmlFor="tech-stack">Tech Stack (comma-separated)</Label>
+                            <Input 
+                                id="tech-stack" 
+                                placeholder="e.g., React, Python" 
+                                value={techStackFilter}
+                                onChange={(e) => setTechStackFilter(e.target.value)}
+                            />
                         </div>
-                        <Button className="w-full" disabled>Apply Filters</Button>
+                         <SheetClose asChild>
+                            <Button className="w-full" onClick={handleApplyFilters}>Apply Filters</Button>
+                        </SheetClose>
                     </div>
                 </SheetContent>
             </Sheet>
@@ -219,7 +250,7 @@ export default function SwipePage() {
                       </CardHeader>
                       <CardContent>
                           <p>
-                            {noMoreProfiles ? "Check back later for new profiles." : `You've reached your daily limit of ${SWIPE_LIMIT} swipes. Come back tomorrow!`}
+                            {noMoreProfiles ? "Check back later for new profiles or adjust your filters." : `You've reached your daily limit of ${SWIPE_LIMIT} swipes. Come back tomorrow!`}
                           </p>
                       </CardContent>
                   </Card>
@@ -251,3 +282,5 @@ export default function SwipePage() {
     </main>
   );
 }
+
+    
