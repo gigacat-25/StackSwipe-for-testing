@@ -12,23 +12,23 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
 
-export default function LoginPage() {
+export default function SignupPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useAuth();
+    const { signup } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await login(email, password);
+            await signup(email, password);
             router.push('/dashboard');
         } catch (error) {
-            console.error('Authentication error:', error);
+            console.error('Signup error:', error);
             toast({
-                title: 'Authentication Failed',
-                description: 'Could not log in. Please check your email and password.',
+                title: 'Signup Failed',
+                description: 'Could not create an account. Please try again.',
                 variant: 'destructive',
             });
         }
@@ -41,13 +41,13 @@ export default function LoginPage() {
                     <div className="flex justify-center items-center mb-4">
                         <Icons.logo className="size-8 text-primary" />
                     </div>
-                    <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
+                    <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
                     <CardDescription>
-                        Enter your email and password to sign in to your account.
+                        Enter your email and password to get started.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleLogin} className="grid gap-4">
+                    <form onSubmit={handleSignup} className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
@@ -70,13 +70,13 @@ export default function LoginPage() {
                             />
                         </div>
                         <Button type="submit" className="w-full">
-                            Login
+                            Create Account
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Don&apos;t have an account?{' '}
-                        <Link href="/signup" className="underline">
-                            Sign up
+                        Already have an account?{' '}
+                        <Link href="/login" className="underline">
+                            Login
                         </Link>
                     </div>
                 </CardContent>

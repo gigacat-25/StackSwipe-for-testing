@@ -9,8 +9,9 @@ import {
   MessageSquare,
   Sparkles,
   User,
+  LogOut,
 } from 'lucide-react';
-
+import { useAuth } from '@/hooks/use-auth';
 import {
   Sidebar,
   SidebarHeader,
@@ -22,6 +23,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Icons } from '@/components/icons';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 
 const menuItems = [
@@ -36,6 +38,7 @@ const menuItems = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const isActive = (href: string) => {
     if (href === '/dashboard') return pathname === '/dashboard';
@@ -83,6 +86,26 @@ export function DashboardSidebar() {
                 <User />
                 <span>Edit Profile</span>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+           {user && (
+            <SidebarMenuItem>
+               <div className="flex items-center gap-3 p-2">
+                  <Avatar className="size-8">
+                      <AvatarImage src={user.photoURL ?? undefined} />
+                      <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <span className="truncate text-sm font-medium">{user.email}</span>
+               </div>
+            </SidebarMenuItem>
+           )}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+                onClick={logout}
+                tooltip={{ children: "Logout", side: 'right' }}
+              >
+                  <LogOut />
+                  <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
