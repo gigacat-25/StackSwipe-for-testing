@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 
-const publicRoutes = ['/', '/login', '/signup'];
+const publicRoutes = ['/login', '/signup'];
 const onboardingRoute = '/onboarding';
 
 export function AppRouter({ children }: { children: React.ReactNode }) {
@@ -25,8 +25,8 @@ export function AppRouter({ children }: { children: React.ReactNode }) {
         if (!hasProfile && !isOnboarding) {
             // If user is logged in but has no profile, force onboarding.
             router.replace(onboardingRoute);
-        } else if (hasProfile && (isPublic || isOnboarding)) {
-            // If user has a profile and is on a public page or onboarding, send to dashboard.
+        } else if (hasProfile && (isPublic || isOnboarding || pathname === '/')) {
+            // If user has a profile and is on a public page, onboarding, or root, send to dashboard.
             router.replace('/dashboard');
         }
     } else {
@@ -55,7 +55,7 @@ export function AppRouter({ children }: { children: React.ReactNode }) {
     return <div className="flex h-screen items-center justify-center"><p>Loading...</p></div>;
   }
   
-  if (user && hasProfile && (isPublic || pathname === onboardingRoute)) {
+  if (user && hasProfile && (isPublic || pathname === onboardingRoute || pathname === '/')) {
      return <div className="flex h-screen items-center justify-center"><p>Loading...</p></div>;
   }
 
