@@ -8,6 +8,8 @@ export type UserProfile = {
   bio: string;
   currentWork: string;
   location: string;
+  age: number;
+  gender: string;
   techStack: string[];
   interests: string[];
   networkingTags: string[];

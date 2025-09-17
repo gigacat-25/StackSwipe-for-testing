@@ -14,7 +14,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
   return (
     <Card className="w-full max-w-sm rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col">
       <CardHeader className="p-6 pb-2">
-            <CardTitle className="font-headline text-2xl">{profile.name}</CardTitle>
+            <CardTitle className="font-headline text-2xl">{profile.name}, {profile.age}</CardTitle>
             <CardDescription className="flex items-center gap-1.5 text-muted-foreground">
               <MapPin className="h-4 w-4" />
               {profile.location}
