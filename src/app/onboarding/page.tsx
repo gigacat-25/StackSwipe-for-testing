@@ -15,12 +15,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import type { UserProfile } from '@/lib/data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const profileStepSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   headline: z.string().min(5, { message: 'Headline must be at least 5 characters.' }),
   bio: z.string().min(10, { message: 'Bio must be at least 10 characters.' }),
   location: z.string().min(2, { message: 'Location must be at least 2 characters.' }),
+  age: z.coerce.number().min(18, { message: 'You must be at least 18.' }).max(99),
+  gender: z.string().min(1, { message: 'Please select a gender.'}),
 });
 
 const workStepSchema = z.object({
@@ -39,7 +42,7 @@ const goalsStepSchema = z.object({
 });
 
 const allSteps = [
-    { id: 'Step 1', name: 'Profile Basics', fields: ['name', 'headline', 'bio', 'location'], schema: profileStepSchema },
+    { id: 'Step 1', name: 'Profile Basics', fields: ['name', 'headline', 'bio', 'location', 'age', 'gender'], schema: profileStepSchema },
     { id: 'Step 2', name: 'Work & Skills', fields: ['currentWork', 'techStack', 'interests'], schema: workStepSchema },
     { id: 'Step 3', name: 'Social Links', fields: ['github', 'linkedin'], schema: socialStepSchema },
     { id: 'Step 4', name: 'Networking Goals', fields: ['networkingTags'], schema: goalsStepSchema },
@@ -68,6 +71,7 @@ export default function OnboardingPage() {
             networkingTags: '',
             github: '',
             linkedin: '',
+            gender: '',
         },
     });
 
@@ -98,6 +102,8 @@ export default function OnboardingPage() {
             headline: data.headline,
             bio: data.bio,
             location: data.location,
+            age: data.age,
+            gender: data.gender,
             currentWork: data.currentWork,
             techStack: (data.techStack || '').split(',').map(item => item.trim()).filter(Boolean),
             interests: (data.interests || '').split(',').map(item => item.trim()).filter(Boolean),
@@ -149,6 +155,35 @@ export default function OnboardingPage() {
                                             <FormMessage />
                                         </FormItem>
                                     )} />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField control={form.control} name="age" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Age</FormLabel>
+                                                <FormControl><Input type="number" {...field} placeholder="e.g., 28" /></FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={form.control} name="gender" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Gender</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a gender" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="male">Male</SelectItem>
+                                                        <SelectItem value="female">Female</SelectItem>
+                                                        <SelectItem value="non-binary">Non-binary</SelectItem>
+                                                        <SelectItem value="other">Other</SelectItem>
+                                                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    </div>
                                     <FormField control={form.control} name="headline" render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Headline</FormLabel>

@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { UserProfile } from '@/lib/data';
-import { User as UserIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function ProfilePage() {
     const { profile: initialProfile, updateProfile, loading } = useAuth();
@@ -51,7 +51,7 @@ export default function ProfilePage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setProfile(prev => prev ? ({ ...prev, [name]: value }) : null);
+        setProfile(prev => prev ? ({ ...prev, [name]: name === 'age' ? parseInt(value, 10) : value }) : null);
     };
 
     const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +62,10 @@ export default function ProfilePage() {
     const handleArrayChange = (field: 'techStack' | 'interests' | 'networkingTags', value: string) => {
         setProfile(prev => prev ? ({ ...prev, [field]: value.split(',').map(item => item.trim()) }) : null);
     };
+
+    const handleSelectChange = (field: 'gender', value: string) => {
+         setProfile(prev => prev ? ({ ...prev, [field]: value }) : null);
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,6 +103,28 @@ export default function ProfilePage() {
                             <div className="space-y-2">
                                 <Label htmlFor="headline">Headline</Label>
                                 <Input id="headline" name="headline" value={profile.headline ?? ''} onChange={handleInputChange} />
+                            </div>
+                        </div>
+
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="age">Age</Label>
+                                <Input id="age" name="age" type="number" value={profile.age ?? ''} onChange={handleInputChange} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="gender">Gender</Label>
+                                <Select value={profile.gender ?? ''} onValueChange={(value) => handleSelectChange('gender', value)}>
+                                    <SelectTrigger id="gender">
+                                        <SelectValue placeholder="Select a gender" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="male">Male</SelectItem>
+                                        <SelectItem value="female">Female</SelectItem>
+                                        <SelectItem value="non-binary">Non-binary</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
 
