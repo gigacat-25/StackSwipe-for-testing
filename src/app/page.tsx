@@ -5,26 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/hooks/use-auth';
-import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
-    const { user, loading } = useAuth();
-    const router = useRouter();
-
-    if (loading) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <p>Loading...</p>
-            </div>
-        );
-    }
-    
-    if (user) {
-        router.replace('/dashboard');
-        return null;
-    }
-    
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
       <main className="flex flex-1 flex-col items-center justify-center px-4 text-center">
