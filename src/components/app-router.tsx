@@ -35,7 +35,10 @@ export function AppRouter({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, hasProfile, router, pathname]);
 
-  if (loading) {
+  const isPublic = publicRoutes.includes(pathname) || pathname === '/';
+
+  // Show loading indicator if auth state is loading, or if routing logic is still processing
+  if (loading || (user && !hasProfile && pathname !== onboardingRoute) || (user && hasProfile && (isPublic || pathname === onboardingRoute)) || (!user && !isPublic) ) {
       return (
         <div className="flex h-screen items-center justify-center flex-col gap-4">
             <Icons.logo className="size-10 animate-pulse" />
@@ -43,29 +46,6 @@ export function AppRouter({ children }: { children: React.ReactNode }) {
         </div>
       )
   }
-  
-  const isPublic = publicRoutes.includes(pathname) || pathname === '/';
-  if (!user && !isPublic) {
-    return <div className="flex h-screen items-center justify-center flex-col gap-4">
-            <Icons.logo className="size-10 animate-pulse" />
-            <p className="text-muted-foreground">Warming up the code engines…</p>
-        </div>;
-  }
-
-  if (user && !hasProfile && pathname !== onboardingRoute) {
-    return <div className="flex h-screen items-center justify-center flex-col gap-4">
-            <Icons.logo className="size-10 animate-pulse" />
-            <p className="text-muted-foreground">Warming up the code engines…</p>
-        </div>;
-  }
-  
-  if (user && hasProfile && (isPublic || pathname === onboardingRoute)) {
-     return <div className="flex h-screen items-center justify-center flex-col gap-4">
-            <Icons.logo className="size-10 animate-pulse" />
-            <p className="text-muted-foreground">Warming up the code engines…</p>
-        </div>;
-  }
-
 
   return <>{children}</>;
 }
