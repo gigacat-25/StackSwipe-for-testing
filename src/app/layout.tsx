@@ -3,6 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from '@/hooks/use-auth';
+import { AppRouter } from '@/components/app-router';
+import { MotionProvider } from '@/components/motion-provider';
 
 export default function RootLayout({
   children,
@@ -32,8 +34,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <AuthProvider>
-              {children}
-              <Toaster />
+                <MotionProvider>
+                    <AppRouter>
+                        {children}
+                    </AppRouter>
+                    <Toaster />
+                </MotionProvider>
             </AuthProvider>
           </ThemeProvider>
       </body>
